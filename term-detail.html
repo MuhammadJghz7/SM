@@ -55,4 +55,194 @@
 
           <div class="mb-3">
             <label for="selectCourse" class="form-label">انتخاب درس</label>
-            <select id="selectCourse" class="
+            <select id="selectCourse" class="form-select" required></select>
+          </div>
+
+          <div class="mb-3">
+            <label for="groupNumber" class="form-label">گروه درسی</label>
+            <input type="text" id="groupNumber" class="form-control" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="classSessions" class="form-label">تعداد جلسات کلاس</label>
+            <input type="number" min="1" max="20" id="classSessions" class="form-control" value="1" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="location" class="form-label">محل برگزاری کلاس</label>
+            <input type="text" id="location" class="form-control" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="examTime" class="form-label">زمان امتحان (مثلاً 1402/12/10 9:00)</label>
+            <input type="text" id="examTime" class="form-control" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="score" class="form-label">نمره (0 تا 20)</label>
+            <input type="number" min="0" max="20" step="0.1" id="score" class="form-control" value="0" required />
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">ثبت درس در ترم</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer class="mt-5 mb-3 text-center text-muted">
+  ساخته شده توسط محمد
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const termId = parseInt(urlParams.get("termId"), 10);
+  document.getElementById("termIdDisplay").textContent = termId;
+
+  let terms = getTerms();
+  let courses = getCourses();
+
+  let term = terms.find(t => t.id === termId);
+  if (!term) {
+    alert("ترم یافت نشد");
+    window.location.href = "terms.html";
+  }
+
+  function renderTermCourses() {
+    const tbody = document.getElementById("termCoursesBody");
+    tbody.innerHTML = "";
+
+    term.courses.forEach((tc, index) => {
+      const course = courses.find(c => c.id === tc.courseId);
+      if (!course) return;
+
+      const passed = tc.score >= 10;
+      const statusClass = passed ? "badge-passed" : "badge-failed";
+      const statusText = passed ? "پاس شده" : "ناموفق";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${course.id}</td>
+        <td>${course.name}</td>
+        <td>${tc.groupNumber}</td>
+        <td>${tc.classSessions}</td>
+        <td>${tc.location}</td>
+        <td>${tc.examTime}</td>
+        <td><input type="number" min="0" max="20" step="0.1" class="form-control score-input" data-index="${index}" value="${tc.score}" /></td>
+        <td><span class="badge ${statusClass}">${statusText}</span></td>
+        <td><button class="btn btn-danger btn-sm btn-remove-course" data-index="${index}">حذف</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // به‌روزرسانی نمره و وضعیت پاس شدن
+  document.getElementById("termCoursesBody").addEventListener("input", e => {
+    if (e.target.classList.contains("score-input")) {
+      const idx = parseInt(e.target.dataset.index, 10);
+      let val = parseFloat(e.target.value);
+      if (isNaN(val) || val < 0) val = 0;
+      if (val > 20) val = 20;
+
+      term.courses[idx].score = val;
+      saveTerms(terms);
+      renderTermCourses();
+    }
+  });
+
+  // حذف درس از ترم
+  document.getElementById("termCoursesBody").addEventListener("click", e => {
+    if (e.target.classList.contains("btn-remove-course")) {
+      const idx = parseInt(e.target.dataset.index, 10);
+      if (confirm("آیا مطمئنید می‌خواهید این درس را حذف کنید؟")) {
+        term.courses.splice(idx, 1);
+        saveTerms(terms);
+        renderTermCourses();
+      }
+    }
+  });
+
+  // باز کردن مودال افزودن درس
+  const addCourseModal = new bootstrap.Modal(document.getElementById("addCourseModal"));
+  document.getElementById("addCourseToTermBtn").addEventListener("click", () => {
+    populateCourseSelect();
+    document.getElementById("addCourseForm").reset();
+    addCourseModal.show();
+  });
+
+  // پر کردن لیست دروس برای انتخاب در مودال
+  function populateCourseSelect() {
+    const select = document.getElementById("selectCourse");
+    select.innerHTML = "";
+
+    // فقط درس‌هایی که قبلاً در ترم اضافه نشده‌اند
+    const addedCourseIds = term.courses.map(tc => tc.courseId);
+
+    courses.forEach(c => {
+      if (!addedCourseIds.includes(c.id)) {
+        const option = document.createElement("option");
+        option.value = c.id;
+        option.textContent = `${c.id} - ${c.name}`;
+        select.appendChild(option);
+      }
+    });
+  }
+
+  // ثبت درس جدید در ترم با اعتبارسنجی پیش‌نیازها و هم‌نیازها
+  document.getElementById("addCourseForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    const selectedCourseId = document.getElementById("selectCourse").value;
+    const groupNumber = document.getElementById("groupNumber").value.trim();
+    const classSessions = parseInt(document.getElementById("classSessions").value);
+    const location = document.getElementById("location").value.trim();
+    const examTime = document.getElementById("examTime").value.trim();
+    const score = parseFloat(document.getElementById("score").value);
+
+    const course = courses.find(c => c.id === selectedCourseId);
+    if (!course) {
+      alert("درس انتخاب شده معتبر نیست.");
+      return;
+    }
+
+    // چک کردن پیش‌نیازها
+    for (const preId of course.prerequisites) {
+      const prePassed = courses.find(c => c.id === preId && c.passed);
+      if (!prePassed) {
+        alert(`پیش‌نیاز درس ${preId} پاس نشده است.`);
+        return;
+      }
+    }
+
+    // چک کردن هم‌نیازها (باید در ترم انتخاب شوند)
+    for (const coId of course.corequisites) {
+      if (!term.courses.some(tc => tc.courseId === coId)) {
+        alert(`هم‌نیاز درس ${coId} باید هم‌زمان با این درس انتخاب شود.`);
+        return;
+      }
+    }
+
+    term.courses.push({
+      courseId: selectedCourseId,
+      groupNumber,
+      classSessions,
+      location,
+      examTime,
+      score
+    });
+
+    saveTerms(terms);
+    renderTermCourses();
+    addCourseModal.hide();
+  });
+
+  renderTermCourses();
+</script>
+
+</body>
+</html>
