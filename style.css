@@ -1,68 +1,29 @@
 body {
-    font-family: tahoma, sans-serif;
-    background: #f5f5f5;
-    margin: 0;
-    padding: 0;
+  background: #f4f6f8;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-nav {
-    background: #444;
-    padding: 10px;
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #007bff !important;
 }
 
-nav button {
-    color: #fff;
-    background: #666;
-    border: none;
-    padding: 8px 15px;
-    margin-left: 5px;
-    cursor: pointer;
+.card {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border-radius: 12px;
 }
 
-nav button:hover {
-    background: #888;
+footer {
+  margin-top: 30px;
+  text-align: center;
+  color: #777;
 }
 
-.view {
-    padding: 20px;
+.badge-passed {
+  background-color: #28a745 !important;
 }
 
-.hidden {
-    display: none;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-
-table, th, td {
-    border: 1px solid #ccc;
-}
-
-th, td {
-    padding: 8px;
-    text-align: center;
-}
-
-button.small-btn {
-    padding: 3px 8px;
-    background: red;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-#session-fields {
-    background: #eee;
-    padding: 10px;
-    margin: 10px 0;
-}
-
-.session-group {
-    background: #fff;
-    padding: 8px;
-    margin-bottom: 8px;
-    border: 1px solid #ccc;
+.badge-failed {
+  background-color: #dc3545 !important;
 }
