@@ -1,3 +1,39 @@
+const sessionsContainer = document.getElementById("sessionsContainer");
+const classSessionsInput = document.getElementById("classSessions");
+
+function createSessionFields(count) {
+  sessionsContainer.innerHTML = ""; // اول پاک کن
+
+  for (let i = 1; i <= count; i++) {
+    const sessionDiv = document.createElement("div");
+    sessionDiv.classList.add("mb-2", "border", "p-2", "rounded");
+
+    sessionDiv.innerHTML = `
+      <label>جلسه ${i}</label>
+      <div class="mb-1">
+        <input type="text" name="sessionTime${i}" placeholder="زمان برگزاری (مثلاً دوشنبه 10-12)" class="form-control" required />
+      </div>
+      <div>
+        <input type="text" name="sessionLocation${i}" placeholder="محل برگزاری" class="form-control" required />
+      </div>
+    `;
+
+    sessionsContainer.appendChild(sessionDiv);
+  }
+}
+
+// وقتی تعداد جلسات تغییر کرد، فیلدها رو بساز
+classSessionsInput.addEventListener("input", e => {
+  let val = parseInt(e.target.value);
+  if (isNaN(val) || val < 1) val = 1;
+  if (val > 20) val = 20;
+  createSessionFields(val);
+});
+
+// موقع باز شدن مودال حداقل 1 جلسه رو بساز
+createSessionFields(parseInt(classSessionsInput.value));
+
+
 // Helper functions for LocalStorage management
 
 function getCourses() {
