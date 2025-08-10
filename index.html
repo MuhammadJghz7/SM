@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>مدیریت دروس دانشجو</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+    <button id="nav-dashboard">داشبورد</button>
+    <button id="nav-courses">ثبت دروس</button>
+    <button id="nav-terms">ترم‌ها</button>
+</nav>
+
+<!-- داشبورد -->
+<div id="dashboard" class="view">
+    <h1>داشبورد</h1>
+    <p>تعداد کل دروس: <span id="summary-courses">0</span></p>
+    <p>تعداد کل ترم‌ها: <span id="summary-terms">0</span></p>
+    <p>معدل کل: <span id="overall-gpa">-</span></p>
+</div>
+
+<!-- ثبت دروس -->
+<div id="courses" class="view hidden">
+    <h1>ثبت درس جدید</h1>
+    <form id="course-form">
+        <label>شماره درس: <input id="course-id" required></label>
+        <label>واحد تئوری: <input type="number" id="course-theory" min="0" required></label>
+        <label>واحد عملی: <input type="number" id="course-practical" min="0" required></label>
+        <label>پیش‌نیازها (کدها با ویرگول): <input id="course-prereqs"></label>
+        <label>هم‌نیازها (کدها با ویرگول): <input id="course-coreqs"></label>
+        <p>واحد کل: <span id="course-total">0</span></p>
+        <button type="submit">ثبت درس</button>
+    </form>
+
+    <h2>لیست دروس</h2>
+    <table id="courses-table">
+        <thead>
+            <tr>
+                <th>شماره</th>
+                <th>تئوری</th>
+                <th>عملی</th>
+                <th>کل واحد</th>
+                <th>پیش/هم نیاز</th>
+                <th>نمره</th>
+                <th>عملیات</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- ترم‌ها -->
+<div id="terms" class="view hidden">
+    <h1>مدیریت ترم‌ها</h1>
+    <form id="term-form">
+        <label>شناسه ترم: <input id="term-id" required></label>
+        <button type="submit">افزودن ترم</button>
+    </form>
+
+    <h2>لیست ترم‌ها</h2>
+    <table id="terms-table">
+        <thead>
+            <tr>
+                <th>شناسه</th>
+                <th>تعداد واحد</th>
+                <th>معدل ترم</th>
+                <th>جزئیات</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- جزئیات ترم -->
+<div id="term-detail" class="view hidden">
+    <h1>جزئیات ترم
