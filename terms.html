@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>ترم‌ها</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">مدیریت دروس من</a>
+    <div>
+      <a class="btn btn-outline-primary mx-1" href="index.html">داشبورد</a>
+      <a class="btn btn-outline-primary mx-1" href="courses.html">ثبت دروس</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <h3 class="mb-4">فهرست ترم‌ها</h3>
+
+  <button id="addTermBtn" class="btn btn-success mb-3">افزودن ترم جدید</button>
+
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>شماره ترم</th>
+        <th>تعداد واحد کل</th>
+        <th>معدل ترم</th>
+        <th>عملیات</th>
+      </tr>
+    </thead>
+    <tbody id="termsTableBody"></tbody>
+  </table>
+</div>
+
+<footer class="mt-5 mb-3 text-center text-muted">
+  ساخته شده توسط محمد
+</footer>
+
+<script src="script.js"></script>
+<script>
+  function calculateTermTotalUnits(term) {
+    const courses = getCourses();
+    let sum = 0;
+    term.courses.forEach(tc => {
+      const course = courses.find(c => c.id === tc.courseId);
+      if (course) sum += totalUnits(course);
+    });
+    return sum;
+  }
+
+  function renderTerms() {
+    const terms = getTerms();
+    const tbody = document.getElementById("termsTableBody");
+    tbody.innerHTML = "";
+
+    terms.forEach(term => {
+      const totalUnits = calculateTermTotalUnits(term);
+      const gpa = calculateTermGPA(term);
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${term.id}</td>
+        <td>${totalUnits}</td>
+        <td>${gpa}</td>
+        <td>
+          <a href="term-detail.html?termId=${term.id}" class="btn btn-primary btn-sm">مشاهده جزئیات</a>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById("addTermBtn").addEventListener("click", () => {
+    const terms = getTerms();
+    const newId = terms.length ? Math.max(...terms.map(t => t.id)) + 1 : 1;
+    terms.push({ id: newId, courses: [] });
+    saveTerms(terms);
+    renderTerms();
+  });
+
+  renderTerms();
+</script>
+</body>
+</html>
