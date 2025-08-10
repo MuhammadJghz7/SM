@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fa">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>مدیریت دروس — داشبورد</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>سامانه مدیریت دروس</h1>
+    <nav>
+      <button id="nav-dashboard">داشبورد</button>
+      <button id="nav-courses">مدیریت دروس</button>
+      <button id="nav-terms">ترم‌ها</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- داشبورد -->
+    <section id="dashboard" class="view">
+      <h2>داشبورد</h2>
+
+      <div class="card">
+        <h3>ثبت درس جدید</h3>
+        <form id="course-form">
+          <label>شماره درس (ID): <input required id="course-id" /></label>
+          <label>واحد تئوری: <input type="number" min="0" value="0" id="course-theory" /></label>
+          <label>واحد عملی: <input type="number" min="0" value="0" id="course-practical" /></label>
+          <label>پیش‌نیازها (با کاما جدا کنید — شماره درس): <input id="course-prereqs" /></label>
+          <label>هم‌نیازها (با کاما جدا کنید): <input id="course-coreqs" /></label>
+          <div>تعداد واحد کل: <span id="course-total">0</span></div>
+          <button type="submit">ثبت درس</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>خلاصه</h3>
+        <div>تعداد دروس تعریف‌شده: <span id="summary-courses">0</span></div>
+        <div>تعداد ترم‌ها: <span id="summary-terms">0</span></div>
+      </div>
+    </section>
+
+    <!-- مدیریت دروس -->
+    <section id="courses" class="view hidden">
+      <h2>مدیریت دروس</h2>
+      <div class="card">
+        <table id="courses-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>تئوری</th><th>عملی</th><th>کل واحد</th><th>پیش/هم‌نیاز</th><th>نمره</th><th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ترم‌ها -->
+    <section id="terms" class="view hidden">
+      <h2>ترم‌ها</h2>
+      <div class="card">
+        <form id="term-form">
+          <label>شناسهٔ ترم (مثلاً 14031): <input id="term-id" required /></label>
+          <button type="submit">ساخت ترم</button>
+        </form>
+      </div>
+      <div class="card">
+        <table id="terms-table">
+          <thead>
+            <tr><th>ترم</th><th>تعداد واحد کل</th><th>عملیات</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- جزئیات ترم -->
+    <section id="term-detail" class="view hidden">
+      <button id="back-to-terms">◀ بازگشت</button>
+      <h2>جزئیات ترم: <span id="term-detail-id"></span></h2>
+
+      <div class="card">
+        <h3>اضافه کردن درس به این ترم</h3>
+        <form id="add-to-term-form">
+          <label>انتخاب درس:
+            <select id="select-course-for-term"></select>
+          </label>
+          <label>گروه درسی: <input id="term-course-group" /></label>
+          <label>محل برگزاری: <input id="term-course-location" /></label>
+          <label>زمان برگزاری (روز، شروع): 
+            <select id="day-select">
+              <option value="sat">شنبه</option>
+              <option value="sun">یک‌شنبه</option>
+              <option value="mon">دوشنبه</option>
+              <option value="tue">سه‌شنبه</option>
+              <option value="wed">چهارشنبه</option>
+              <option value="thu">پنج‌شنبه</option>
+              <option value="fri">جمعه</option>
+            </select>
+            <input type="time" id="start-time" value="08:00"/>
+          </label>
+          <label>هفتهٔ زوج/فرد (برای جلسات متناوب): 
+            <select id="week-type">
+              <option value="every">هر هفته</option>
+              <option value="odd">هفته‌های فرد</option>
+              <option value="even">هفته‌های زوج</option>
+            </select>
+          </label>
+          <label>تاریخ امتحان: <input type="date" id="exam-date" /></label>
+
+          <div>
+            <strong>تعداد جلسات مورد نیاز (محاسبه‌شده):</strong> <span id="required-sessions">0</span>
+            <div class="note">قواعد: هر واحد عملی = یک جلسه ۲ ساعته/هفته. هر ۲ واحد تئوری = یک جلسه ۲ ساعته/هفته. درس ۳ واحد تئوری = ۱ جلسه ثابت + ۱ جلسهٔ زوج/فرد.</div>
+          </div>
+
+          <button type="submit">افزودن به ترم</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>دروس این ترم</h3>
+        <table id="term-courses-table">
+          <thead><tr><th>درس</th><th>گروه</th><th>جلسات</th><th>عملیات</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>برنامه هفتگی (نمایش جلسات)</h3>
+        <div id="weekly-schedule"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>نسخهٔ اولیه — ذخیره در LocalStorage — قابل انتشار روی GitHub Pages</footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
