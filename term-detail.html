@@ -1,266 +1,236 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>جزئیات ترم</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .weekly-schedule table {
+      min-width: 700px;
+    }
+    @media (max-width: 768px) {
+      .weekly-schedule {
+        overflow-x: auto;
+      }
+      th, td {
+        font-size: 0.8rem;
+        padding: 5px;
+      }
+    }
+    .cultural-time {
+      background-color: #ffdddd;
+      color: red;
+      font-weight: bold;
+    }
+    td.busy {
+      background-color: #d1e7dd;
+    }
+    td.conflict {
+      background-color: #ff9999;
+    }
+  </style>
 </head>
-<body>
+<body class="container py-4">
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
-  <div class="container">
-    <a class="navbar-brand" href="index.html">مدیریت دروس من</a>
-    <div>
-      <a class="btn btn-outline-primary mx-1" href="index.html">داشبورد</a>
-      <a class="btn btn-outline-primary mx-1" href="courses.html">ثبت دروس</a>
-      <a class="btn btn-outline-primary mx-1" href="terms.html">فهرست ترم‌ها</a>
-    </div>
-  </div>
-</nav>
+  <h1 class="mb-4">جزئیات ترم <span id="termId"></span></h1>
 
-<div class="container">
-  <h3 class="mb-4">جزئیات ترم <span id="termIdDisplay"></span></h3>
-
-  <button class="btn btn-success mb-3" id="addCourseToTermBtn">افزودن درس به ترم</button>
-
-  <table class="table table-bordered table-striped">
-    <thead>
-      <tr>
-        <th>شماره درس</th>
-        <th>نام درس</th>
-        <th>گروه</th>
-        <th>جلسات</th>
-        <th>زمان امتحان</th>
-        <th>نمره</th>
-        <th>وضعیت</th>
-        <th>عملیات</th>
-      </tr>
-    </thead>
-    <tbody id="termCoursesBody"></tbody>
-  </table>
-</div>
-
-<!-- Modal افزودن درس -->
-<div class="modal fade" id="addCourseModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
+  <!-- فرم افزودن درس -->
+  <div class="card mb-4">
+    <div class="card-header">افزودن درس به ترم</div>
+    <div class="card-body">
       <form id="addCourseForm">
-        <div class="modal-header">
-          <h5 class="modal-title">افزودن درس به ترم</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="mb-3">
+          <label for="courseSelect" class="form-label">انتخاب درس</label>
+          <select id="courseSelect" class="form-select" required></select>
         </div>
-        <div class="modal-body">
-
-          <div class="mb-3">
-            <label class="form-label">انتخاب درس</label>
-            <select id="selectCourse" class="form-select" required></select>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">گروه درسی</label>
-            <input type="text" id="groupNumber" class="form-control" required />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">تعداد جلسات کلاس</label>
-            <input type="number" min="1" max="20" id="classSessions" class="form-control" value="1" required />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">جزئیات جلسات</label>
-            <div id="sessionsContainer"></div>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">زمان امتحان</label>
-            <input type="text" id="examTime" class="form-control" placeholder="مثلاً 1403/10/20 9:00" required />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">نمره (۰ تا ۲۰)</label>
-            <input type="number" min="0" max="20" step="0.1" id="score" class="form-control" value="0" required />
-          </div>
-
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">ثبت</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-        </div>
+        <div id="sessionsContainer"></div>
+        <button type="submit" class="btn btn-primary">افزودن به ترم</button>
       </form>
     </div>
   </div>
-</div>
 
-<footer class="mt-5 mb-3 text-center text-muted">
-  ساخته شده توسط محمد
-</footer>
+  <!-- جدول هفتگی -->
+  <h3 class="mb-3">برنامه هفتگی</h3>
+  <div class="table-responsive weekly-schedule">
+    <table class="table table-bordered text-center align-middle">
+      <thead>
+        <tr>
+          <th>ساعت / روز</th>
+          <th>شنبه</th>
+          <th>یکشنبه</th>
+          <th>دوشنبه</th>
+          <th>سه‌شنبه</th>
+          <th>چهارشنبه</th>
+          <th>پنجشنبه</th>
+        </tr>
+      </thead>
+      <tbody id="scheduleBody">
+        <tr>
+          <th>08:00 - 10:00</th>
+          <td data-day="sat" data-time="08-10"></td>
+          <td data-day="sun" data-time="08-10"></td>
+          <td data-day="mon" data-time="08-10"></td>
+          <td data-day="tue" data-time="08-10"></td>
+          <td data-day="wed" data-time="08-10"></td>
+          <td data-day="thu" data-time="08-10"></td>
+        </tr>
+        <tr>
+          <th>10:00 - 12:00</th>
+          <td data-day="sat" data-time="10-12"></td>
+          <td data-day="sun" data-time="10-12"></td>
+          <td class="cultural-time" data-day="mon" data-time="10-12">⛔</td>
+          <td data-day="tue" data-time="10-12"></td>
+          <td data-day="wed" data-time="10-12"></td>
+          <td data-day="thu" data-time="10-12"></td>
+        </tr>
+        <tr>
+          <th>13:00 - 15:00</th>
+          <td data-day="sat" data-time="13-15"></td>
+          <td data-day="sun" data-time="13-15"></td>
+          <td data-day="mon" data-time="13-15"></td>
+          <td data-day="tue" data-time="13-15"></td>
+          <td data-day="wed" data-time="13-15"></td>
+          <td data-day="thu" data-time="13-15"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="script.js"></script>
-<script>
-  const urlParams = new URLSearchParams(window.location.search);
-  const termId = parseInt(urlParams.get("termId"), 10);
-  document.getElementById("termIdDisplay").textContent = termId;
+  <script>
+    const termId = new URLSearchParams(window.location.search).get('id');
+    document.getElementById('termId').textContent = termId;
 
-  let terms = getTerms();
-  let courses = getCourses();
-  let term = terms.find(t => t.id === termId);
+    let courses = JSON.parse(localStorage.getItem('courses')) || [];
+    let terms = JSON.parse(localStorage.getItem('terms')) || [];
 
-  if (!term) {
-    alert("ترم پیدا نشد!");
-    window.location.href = "terms.html";
-  }
+    const currentTerm = terms.find(t => t.id == termId);
 
-  function renderTermCourses() {
-    const tbody = document.getElementById("termCoursesBody");
-    tbody.innerHTML = "";
-
-    term.courses.forEach((tc, index) => {
-      const course = courses.find(c => c.id === tc.courseId);
-      if (!course) return;
-
-      const passed = tc.score >= 10;
-      const statusClass = passed ? "badge-passed" : "badge-failed";
-      const statusText = passed ? "پاس شده" : "ناموفق";
-
-      // نمایش جلسات
-      const sessionsList = tc.sessions.map(s => `<li>${s.time} - ${s.location}</li>`).join("");
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${course.id}</td>
-        <td>${course.name}</td>
-        <td>${tc.groupNumber}</td>
-        <td><ul>${sessionsList}</ul></td>
-        <td>${tc.examTime}</td>
-        <td><input type="number" min="0" max="20" step="0.1" class="form-control score-input" data-index="${index}" value="${tc.score}" /></td>
-        <td><span class="badge ${statusClass}">${statusText}</span></td>
-        <td><button class="btn btn-danger btn-sm btn-remove-course" data-index="${index}">حذف</button></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  document.getElementById("termCoursesBody").addEventListener("input", e => {
-    if (e.target.classList.contains("score-input")) {
-      const idx = parseInt(e.target.dataset.index, 10);
-      let val = parseFloat(e.target.value);
-      if (isNaN(val) || val < 0) val = 0;
-      if (val > 20) val = 20;
-
-      term.courses[idx].score = val;
-
-      // اگر پاس شد → در لیست courses هم علامت بزن
-      if (val >= 10) {
-        let c = courses.find(x => x.id === term.courses[idx].courseId);
-        if (c) c.passed = true;
-        saveCourses(courses);
-      }
-
-      saveTerms(terms);
-      renderTermCourses();
-    }
-  });
-
-  document.getElementById("termCoursesBody").addEventListener("click", e => {
-    if (e.target.classList.contains("btn-remove-course")) {
-      const idx = parseInt(e.target.dataset.index, 10);
-      if (confirm("حذف شود؟")) {
-        term.courses.splice(idx, 1);
-        saveTerms(terms);
-        renderTermCourses();
-      }
-    }
-  });
-
-  const addCourseModal = new bootstrap.Modal(document.getElementById("addCourseModal"));
-  document.getElementById("addCourseToTermBtn").addEventListener("click", () => {
-    populateCourseSelect();
-    createSessionFields(parseInt(document.getElementById("classSessions").value));
-    document.getElementById("addCourseForm").reset();
-    addCourseModal.show();
-  });
-
-  function populateCourseSelect() {
-    const select = document.getElementById("selectCourse");
-    select.innerHTML = "";
-
-    const addedIds = term.courses.map(tc => tc.courseId);
-
+    // پر کردن لیست دروس
+    const courseSelect = document.getElementById('courseSelect');
     courses.forEach(c => {
-      if (!addedIds.includes(c.id) && !c.passed) {
-        const option = document.createElement("option");
-        option.value = c.id;
-        option.textContent = `${c.id} - ${c.name}`;
-        select.appendChild(option);
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = `${c.name} (${c.id})`;
+      courseSelect.appendChild(opt);
+    });
+
+    // وقتی یک درس انتخاب می‌شود، فیلدهای جلسات را ایجاد کن
+    courseSelect.addEventListener('change', () => {
+      const selectedCourse = courses.find(c => c.id == courseSelect.value);
+      if (!selectedCourse) return;
+
+      const totalSessions = calcSessions(selectedCourse);
+      const container = document.getElementById('sessionsContainer');
+      container.innerHTML = '';
+
+      for (let i = 1; i <= totalSessions; i++) {
+        const div = document.createElement('div');
+        div.className = 'mb-3';
+        div.innerHTML = `
+          <label class="form-label">جلسه ${i}</label>
+          <div class="row g-2">
+            <div class="col-md-4">
+              <select class="form-select day-select" required>
+                <option value="">انتخاب روز</option>
+                <option value="sat">شنبه</option>
+                <option value="sun">یکشنبه</option>
+                <option value="mon">دوشنبه</option>
+                <option value="tue">سه‌شنبه</option>
+                <option value="wed">چهارشنبه</option>
+                <option value="thu">پنجشنبه</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <select class="form-select time-select" required>
+                <option value="">انتخاب ساعت</option>
+                <option value="08-10">08:00 - 10:00</option>
+                <option value="10-12">10:00 - 12:00</option>
+                <option value="13-15">13:00 - 15:00</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control place-input" placeholder="محل برگزاری" required>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
       }
     });
-  }
 
-  const sessionsContainer = document.getElementById("sessionsContainer");
-  const classSessionsInput = document.getElementById("classSessions");
-
-  function createSessionFields(count) {
-    sessionsContainer.innerHTML = "";
-    for (let i = 1; i <= count; i++) {
-      const div = document.createElement("div");
-      div.classList.add("border", "p-2", "mb-2", "rounded");
-      div.innerHTML = `
-        <strong>جلسه ${i}</strong>
-        <input type="text" name="sessionTime${i}" placeholder="زمان برگزاری" class="form-control mb-1" required />
-        <input type="text" name="sessionLocation${i}" placeholder="محل برگزاری" class="form-control" required />
-      `;
-      sessionsContainer.appendChild(div);
-    }
-  }
-
-  classSessionsInput.addEventListener("input", e => {
-    let val = parseInt(e.target.value);
-    if (isNaN(val) || val < 1) val = 1;
-    if (val > 20) val = 20;
-    createSessionFields(val);
-  });
-
-  document.getElementById("addCourseForm").addEventListener("submit", e => {
-    e.preventDefault();
-
-    const courseId = document.getElementById("selectCourse").value;
-    const groupNumber = document.getElementById("groupNumber").value.trim();
-    const classSessions = parseInt(classSessionsInput.value);
-    const examTime = document.getElementById("examTime").value.trim();
-    const score = parseFloat(document.getElementById("score").value);
-
-    const course = courses.find(c => c.id === courseId);
-    if (!course) {
-      alert("درس انتخابی نامعتبر است");
-      return;
+    // محاسبه تعداد جلسات بر اساس واحد
+    function calcSessions(course) {
+      let sessions = course.practicalUnits; // هر واحد عملی = یک جلسه
+      if (course.theoreticalUnits >= 2) {
+        sessions += Math.floor(course.theoreticalUnits / 2);
+      }
+      return sessions;
     }
 
-    // جمع‌آوری جلسات
-    const sessions = [];
-    for (let i = 1; i <= classSessions; i++) {
-      const time = document.querySelector(`[name=sessionTime${i}]`).value.trim();
-      const location = document.querySelector(`[name=sessionLocation${i}]`).value.trim();
-      sessions.push({ time, location });
+    // پر کردن برنامه هفتگی از اطلاعات ترم
+    function fillSchedule() {
+      document.querySelectorAll('#scheduleBody td').forEach(td => {
+        if (!td.classList.contains('cultural-time')) {
+          td.innerHTML = '';
+          td.classList.remove('busy', 'conflict');
+        }
+      });
+
+      currentTerm.courses.forEach(c => {
+        c.sessions.forEach(s => {
+          const cell = document.querySelector(`[data-day="${s.day}"][data-time="${s.time}"]`);
+          if (cell) {
+            cell.innerHTML = `<strong>${c.name}</strong><br><small>${s.place}</small>`;
+            cell.classList.add('busy');
+          }
+        });
+      });
     }
 
-    term.courses.push({
-      courseId,
-      groupNumber,
-      classSessions,
-      sessions,
-      examTime,
-      score
+    fillSchedule();
+
+    // افزودن درس
+    document.getElementById('addCourseForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const selectedCourse = courses.find(c => c.id == courseSelect.value);
+      const sessions = [];
+      let conflict = false;
+
+      document.querySelectorAll('#sessionsContainer .row').forEach(row => {
+        const day = row.querySelector('.day-select').value;
+        const time = row.querySelector('.time-select').value;
+        const place = row.querySelector('.place-input').value;
+
+        if (day === 'mon' && time === '10-12') {
+          alert('این بازه زمانی ساعت فرهنگی است و نمی‌توان کلاس ثبت کرد.');
+          conflict = true;
+          return;
+        }
+
+        const cell = document.querySelector(`[data-day="${day}"][data-time="${time}"]`);
+        if (cell && cell.innerHTML.trim() !== '') {
+          cell.classList.add('conflict');
+          alert('تداخل برنامه!');
+          conflict = true;
+          return;
+        }
+
+        sessions.push({ day, time, place });
+      });
+
+      if (conflict) return;
+
+      currentTerm.courses.push({
+        id: selectedCourse.id,
+        name: selectedCourse.name,
+        sessions
+      });
+
+      localStorage.setItem('terms', JSON.stringify(terms));
+      fillSchedule();
+      e.target.reset();
+      document.getElementById('sessionsContainer').innerHTML = '';
     });
-
-    saveTerms(terms);
-    renderTermCourses();
-    addCourseModal.hide();
-  });
-
-  renderTermCourses();
-</script>
-
+  </script>
 </body>
 </html>
