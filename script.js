@@ -9,7 +9,6 @@ function saveCourses(courses) {
 }
 
 function getTerms() {
-  function getTerms() {
     let terms = JSON.parse(localStorage.getItem("terms")) || [];
 
     if (terms.length === 0) {
@@ -27,7 +26,6 @@ function getTerms() {
         terms = defaultTerms;
     }
     return terms;
-}
 }
 
 function saveTerms(terms) {
