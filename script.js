@@ -9,7 +9,25 @@ function saveCourses(courses) {
 }
 
 function getTerms() {
-  return JSON.parse(localStorage.getItem("terms") || "[]");
+  function getTerms() {
+    let terms = JSON.parse(localStorage.getItem("terms")) || [];
+
+    if (terms.length === 0) {
+        const defaultTerms = [
+            4021, 4022, 4023,
+            4031, 4032, 4033,
+            4041, 4042, 4043,
+            4051, 4052, 4053,
+            4061, 4062, 4063
+        ].map(id => ({
+            id: id,
+            courses: []
+        }));
+        localStorage.setItem("terms", JSON.stringify(defaultTerms));
+        terms = defaultTerms;
+    }
+    return terms;
+}
 }
 
 function saveTerms(terms) {
