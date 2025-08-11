@@ -41,6 +41,17 @@
       </div>
     </div>
 
+<div class="col-md-4">
+  <label for="courseType" class="form-label">نوع درس</label>
+  <select id="courseType" class="form-select" required>
+    <option value="">انتخاب کنید...</option>
+    <option value="عمومی">عمومی</option>
+    <option value="پایه">پایه</option>
+    <option value="اصلی">اصلی</option>
+    <option value="اختیاری">اختیاری</option>
+  </select>
+</div>
+
     <div class="row g-3 mt-3">
       <div class="col-md-6">
         <label for="prerequisites" class="form-label">پیش‌نیازها (شماره درس‌ها با کاما جدا)</label>
@@ -66,6 +77,7 @@
         <th>واحد عملی</th>
         <th>واحد تئوری</th>
         <th>واحد کل</th>
+        <th>نوع درس</th>
         <th>پیش‌نیازها</th>
         <th>هم‌نیازها</th>
         <th>وضعیت</th>
@@ -99,6 +111,7 @@
         <td>${c.practical}</td>
         <td>${c.theoretical}</td>
         <td>${totalUnits(c)}</td>
+        <td>${c.type}</td>
         <td>${c.prerequisites.join(", ")}</td>
         <td>${c.corequisites.join(", ")}</td>
         <td>${statusBadge}</td>
@@ -135,6 +148,7 @@
       name,
       practical,
       theoretical,
+      type,
       prerequisites,
       corequisites,
       passed: false
