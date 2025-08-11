@@ -64,12 +64,14 @@
 
 <script>
   // وقتی صفحه کاملا لود شد، لودینگ رو مخفی کن
-  window.addEventListener('load', () => {
+    window.addEventListener('load', () => {
     const loadingScreen = document.getElementById('loading-screen');
-    loadingScreen.classList.add('hide');
     setTimeout(() => {
-      loadingScreen.style.display = 'none';
-    }, 20000); // بعد از انیمیشن محو شدن
+      loadingScreen.classList.add('hide');
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+      }, 500);
+    }, 3000); // ۳ ثانیه زمان نمایش لودینگ
   });
 </script>
 
