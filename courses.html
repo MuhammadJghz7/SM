@@ -127,6 +127,7 @@
     const name = document.getElementById("courseName").value.trim();
     const practical = parseInt(document.getElementById("practicalUnits").value);
     const theoretical = parseInt(document.getElementById("theoreticalUnits").value);
+    const type = document.getElementById("courseType").value.trim();
     const prerequisites = document.getElementById("prerequisites").value
       .split(",").map(s => s.trim()).filter(s => s);
     const corequisites = document.getElementById("corequisites").value
