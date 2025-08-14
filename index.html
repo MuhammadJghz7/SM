@@ -129,7 +129,7 @@
     const passedCourses = courses.filter(c => c.passed);
 
     // جمع واحدهای عملی و تئوری دروس پاس شده
-    const totalUnits = passedCourses;
+    const totalUnits = passedCourses((sum, c) => sum + totalUnits(c));
     document.getElementById("totalUnitsPassed").textContent = totalUnits + " واحد";
 
     // معدل کل
