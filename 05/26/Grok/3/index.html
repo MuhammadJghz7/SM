@@ -161,49 +161,113 @@
         // ترم‌های پیش‌فرض
         const defaultTerms = ['۴۰۲۱', '۴۰۲۲', '۴۰۲۳', '۴۰۳۱', '۴۰۳۲', '۴۰۳۳', '۴۰۴۱', '۴۰۴۲', '۴۰۴۳', '۴۰۵۱', '۴۰۵۲', '۴۰۵۳', '۴۰۶۱', '۴۰۶۲', '۴۰۶۳'];
 
-        // متغیرهای اصلی
-        let courses = [];
+        // دروس پیش‌فرض کارشناسی فیزیک مطابق سرفصل ۱۳۹۴ + دروس عمومی
+        const defaultCourses = [
+            // دروس عمومی (24 واحد)
+            { id: '001', name: 'اندیشه اسلامی ۱ (مبدا و معاد)', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '002', name: 'اندیشه اسلامی ۲ (نبوت و امامت)', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '003', name: 'انسان در اسلام', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '004', name: 'حقوق اجتماعی و سیاسی در اسلام', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '005', name: 'اخلاق اسلامی (مبانی و مفاهیم)', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '006', name: 'آیین زندگی (اخلاق کاربردی)', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '007', name: 'عرفان عملی در اسلام', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '008', name: 'اخلاق مهندسی', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '009', name: 'انقلاب اسلامی ایران', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '010', name: 'آشنایی با قانون اساسی جمهوری اسلامی ایران', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '011', name: 'اندیشه سیاسی امام خمینی (ره)', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '012', name: 'تاریخ فرهنگ و تمدن اسلامی', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '013', name: 'تاریخ تحلیلی صدر اسلام', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '014', name: 'تاریخ امامت', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '015', name: 'تفسیر موضوعی قرآن', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '016', name: 'تفسیر موضوعی نهج‌البلاغه', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '017', name: 'فارسی عمومی', theoretical: 3, practical: 0, total: 3, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '018', name: 'زبان عمومی', theoretical: 3, practical: 0, total: 3, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '019', name: 'تربیت بدنی ۱', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '020', name: 'تربیت بدنی ۲', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '021', name: 'دانش خانواده و جمعیت', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '022', name: 'مهارت زندگی دانشجویی', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+
+            // دروس پایه (35 واحد)
+            { id: '180122', name: 'شیمی عمومی', theoretical: 3, practical: 0, total: 3, prerequisites: '', corequisites: '', type: 'پایه' },
+            { id: '21015', name: 'آزمایشگاه شیمی عمومی', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '180122', type: 'پایه' },
+            { id: '180111', name: 'ریاضی عمومی ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '', corequisites: '', type: 'پایه' },
+            { id: '180112', name: 'ریاضی عمومی ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '180111', corequisites: '', type: 'پایه' },
+            { id: '180113', name: 'معادلات دیفرانسیل', theoretical: 3, practical: 0, total: 3, prerequisites: '180112', corequisites: '', type: 'پایه' },
+            { id: '180114', name: 'فیزیک عمومی ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '', corequisites: '', type: 'پایه' },
+            { id: '180115', name: 'فیزیک عمومی ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '180114', corequisites: '', type: 'پایه' },
+            { id: '180116', name: 'فیزیک عمومی ۳', theoretical: 3, practical: 0, total: 3, prerequisites: '180115', corequisites: '', type: 'پایه' },
+            { id: '180117', name: 'فیزیک عمومی ۴', theoretical: 3, practical: 0, total: 3, prerequisites: '180116', corequisites: '', type: 'پایه' },
+            { id: '96110', name: 'آزمایشگاه فیزیک عمومی ۱', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '180114', type: 'پایه' },
+            { id: '96111', name: 'آزمایشگاه فیزیک عمومی ۲', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '180115', type: 'پایه' },
+            { id: '23205', name: 'آزمایشگاه فیزیک عمومی ۳', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '180116', type: 'پایه' },
+            { id: '180121', name: 'آزمایشگاه فیزیک عمومی ۴', theoretical: 0, practical: 2, total: 2, prerequisites: '', corequisites: '180117', type: 'پایه' },
+            { id: '181936', name: 'کاربرد کامپیوتر', theoretical: 2, practical: 1, total: 3, prerequisites: '', corequisites: '', type: 'پایه' },
+            { id: '181943', name: 'کارگاه ماشین‌افزار', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '', type: 'پایه' },
+            { id: '180125', name: 'کارگاه الکتروتکنیک', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '', type: 'پایه' },
+
+            // دروس الزامی (49 واحد)
+            { id: '181915', name: 'مکانیک تحلیلی ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '180114', corequisites: '180113', type: 'اصلی' },
+            { id: '181916', name: 'مکانیک تحلیلی ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '181915', corequisites: '', type: 'اصلی' },
+            { id: '180128', name: 'ترمودینامیک و مکانیک آماری ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '180116', corequisites: '', type: 'اصلی' },
+            { id: '180129', name: 'ترمودینامیک و مکانیک آماری ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '180128', corequisites: '', type: 'اصلی' },
+            { id: '181918', name: 'ریاضی فیزیک ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '180112,180113', corequisites: '', type: 'اصلی' },
+            { id: '181919', name: 'ریاضی فیزیک ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '181918', corequisites: '', type: 'اصلی' },
+            { id: '180132', name: 'الکترومغناطیس ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '180115,181918', corequisites: '', type: 'اصلی' },
+            { id: '180133', name: 'الکترومغناطیس ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '180132', corequisites: '', type: 'اصلی' },
+            { id: '180134', name: 'مکانیک کوانتومی ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '180117,181919,181916', corequisites: '', type: 'اصلی' },
+            { id: '180135', name: 'مکانیک کوانتومی ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '180134', corequisites: '', type: 'اصلی' },
+            { id: '181928', name: 'فیزیک حالت جامد ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '180129,180134', corequisites: '', type: 'اصلی' },
+            { id: '181948', name: 'آزمایشگاه فیزیک حالت جامد ۱', theoretical: 0, practical: 2, total: 2, prerequisites: '181928', corequisites: '', type: 'اصلی' },
+            { id: '181924', name: 'اپتیک', theoretical: 3, practical: 0, total: 3, prerequisites: '180132', corequisites: '', type: 'اصلی' },
+            { id: '181925', name: 'آزمایشگاه اپتیک', theoretical: 0, practical: 2, total: 2, prerequisites: '181924', corequisites: '', type: 'اصلی' },
+            { id: '180140', name: 'نجوم و اخترفیزیک', theoretical: 3, practical: 0, total: 3, prerequisites: '180117,180134', corequisites: '', type: 'اصلی' },
+            { id: '180141', name: 'فیزیک هسته‌ای و ذرات بنیادی', theoretical: 3, practical: 0, total: 3, prerequisites: '180134', corequisites: '', type: 'اصلی' },
+            { id: '181938', name: 'زبان تخصصی', theoretical: 3, practical: 0, total: 3, prerequisites: '018', corequisites: '', type: 'اصلی' },
+
+            // دروس اختیاری (30 واحد)
+            // فیزیک هسته‌ای
+            { id: '181911', name: 'فیزیک هسته‌ای ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '180141', corequisites: '', type: 'اختیاری' },
+            { id: '181957', name: 'فیزیک هسته‌ای ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '181911', corequisites: '', type: 'اختیاری' },
+            { id: '181959', name: 'فیزیک راکتور هسته‌ای ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '180141', corequisites: '', type: 'اختیاری' },
+            { id: '181966', name: 'فیزیک بهداشت و حفاظت در برابر پرتوها', theoretical: 3, practical: 0, total: 3, prerequisites: '180141', corequisites: '', type: 'اختیاری' },
+            { id: '181961', name: 'اندازه‌گیری و آشکارسازی پرتوها', theoretical: 3, practical: 0, total: 3, prerequisites: '180141', corequisites: '', type: 'اختیاری' },
+            { id: '181962', name: 'شتاب‌دهنده ذرات و اپتیک باریکه‌های یونی', theoretical: 3, practical: 0, total: 3, prerequisites: '180141', corequisites: '', type: 'اختیاری' },
+            { id: '181912', name: 'آزمایشگاه فیزیک هسته‌ای', theoretical: 0, practical: 2, total: 2, prerequisites: '180141', corequisites: '', type: 'اختیاری' },
+            // فیزیک ماده چگال
+            { id: '181947', name: 'فیزیک حالت جامد ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '181928,180135', corequisites: '', type: 'اختیاری' },
+            { id: '180152', name: 'فیزیک لایه‌های نازک', theoretical: 3, practical: 0, total: 3, prerequisites: '181928', corequisites: '', type: 'اختیاری' },
+            { id: '181950', name: 'فیزیک قطعات نیمه‌رسانا', theoretical: 3, practical: 0, total: 3, prerequisites: '181928', corequisites: '', type: 'اختیاری' },
+            { id: '181952', name: 'ابررسانایی و کاربردهای آن', theoretical: 3, practical: 0, total: 3, prerequisites: '181928', corequisites: '', type: 'اختیاری' },
+            { id: '181953', name: 'بلورشناسی', theoretical: 3, practical: 0, total: 3, prerequisites: '181918', corequisites: '', type: 'اختیاری' },
+            { id: '180156', name: 'مبانی نانوفیزیک', theoretical: 3, practical: 0, total: 3, prerequisites: '181928', corequisites: '', type: 'اختیاری' },
+            { id: '180178', name: 'مبانی شبیه‌سازی عددی', theoretical: 3, practical: 0, total: 3, prerequisites: '180128,181936', corequisites: '', type: 'اختیاری' },
+            // ذرات بنیادی، کیهان‌شناسی و اخترفیزیک
+            { id: '180173', name: 'تقارن و نظریه گروه‌ها', theoretical: 3, practical: 0, total: 3, prerequisites: '181918', corequisites: '', type: 'اختیاری' },
+            { id: '181930', name: 'مقدمات ذرات بنیادی', theoretical: 3, practical: 0, total: 3, prerequisites: '180141', corequisites: '', type: 'اختیاری' },
+            { id: '180175', name: 'گرانش', theoretical: 3, practical: 0, total: 3, prerequisites: '181919', corequisites: '', type: 'اختیاری' },
+            { id: '180177', name: 'کیهان‌شناسی', theoretical: 3, practical: 0, total: 3, prerequisites: '180140', corequisites: '', type: 'اختیاری' },
+            { id: '181989', name: 'ریاضی فیزیک ۳', theoretical: 3, practical: 0, total: 3, prerequisites: '181919', corequisites: '', type: 'اختیاری' },
+            { id: '181939', name: 'نسبیت', theoretical: 3, practical: 0, total: 3, prerequisites: '181918,180117', corequisites: '', type: 'اختیاری' },
+            // لیزر و فوتونیک
+            { id: '180146', name: 'طیف‌سنجی', theoretical: 3, practical: 0, total: 3, prerequisites: '180135', corequisites: '', type: 'اختیاری' },
+            { id: '180148', name: 'مبانی طراحی سامانه‌های اپتیکی', theoretical: 3, practical: 0, total: 3, prerequisites: '181924', corequisites: '', type: 'اختیاری' },
+            { id: '181931', name: 'فیزیک پلاسما', theoretical: 3, practical: 0, total: 3, prerequisites: '180133', corequisites: '', type: 'اختیاری' },
+            { id: '181934', name: 'فیزیک لیزر', theoretical: 3, practical: 0, total: 3, prerequisites: '180133,181924', corequisites: '', type: 'اختیاری' },
+            { id: '180149', name: 'اپتوالکترونیک', theoretical: 3, practical: 0, total: 3, prerequisites: '181928', corequisites: '', type: 'اختیاری' },
+            { id: '181970', name: 'کاربردهای لیزر', theoretical: 3, practical: 0, total: 3, prerequisites: '181934', corequisites: '', type: 'اختیاری' },
+            { id: '181926', name: 'الکترونیک ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '180115', corequisites: '', type: 'اختیاری' },
+            { id: '181954', name: 'الکترونیک ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '181926', corequisites: '', type: 'اختیاری' },
+            { id: '181927', name: 'آزمایشگاه الکترونیک ۱', theoretical: 0, practical: 2, total: 2, prerequisites: '181926', corequisites: '', type: 'اختیاری' },
+            // دروس اختیاری مشترک
+            { id: '181945', name: 'پروژه فیزیک', theoretical: 0, practical: 3, total: 3, prerequisites: '', corequisites: '', type: 'اختیاری' },
+            { id: '180180', name: 'مهارت‌آموزی ۱', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '', type: 'اختیاری' },
+            { id: '180181', name: 'مهارت‌آموزی ۲', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '', type: 'اختیاری' }
+        ];
+
+        let courses = JSON.parse(localStorage.getItem('courses')) || defaultCourses;
         let terms = JSON.parse(localStorage.getItem('terms')) || defaultTerms.map(t => ({ id: t, courses: [], totalUnits: 0, gpa: 0 }));
         let passedCourses = JSON.parse(localStorage.getItem('passedCourses')) || [];
         let currentLanguage = localStorage.getItem('language') || 'fa';
-
-        // تابع بارگذاری دروس
-        async function loadCourses() {
-            showLoading(true);
-            try {
-                console.log('Attempting to fetch courses.json...');
-                const response = await fetch('courses.json');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                courses = await response.json();
-                console.log('Courses loaded:', courses);
-                saveData();
-                renderCoursesTiles();
-                calculateOverallGPA();
-                updateProgress();
-            } catch (error) {
-                console.error('Error loading courses:', error);
-                showToast('خطا در بارگذاری دروس: ' + error.message);
-                // داده‌های نمونه برای تست
-                courses = [
-                    {
-                        id: "001",
-                        name: "تست درس ۱",
-                        theoretical: 2,
-                        practical: 0,
-                        total: 2,
-                        prerequisites: "",
-                        corequisites: "",
-                        type: "عمومی"
-                    }
-                ];
-                console.log('Falling back to sample courses:', courses);
-                renderCoursesTiles();
-            } finally {
-                showLoading(false);
-            }
-        }
 
         const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه'];
         const hours = ['۸:۰۰ تا ۱۰:۰۰', '۱۰:۰۰ تا ۱۲:۰۰', '۱۳:۰۰ تا ۱۵:۰۰', '۱۵:۰۰ تا ۱۷:۰۰', '۱۷:۰۰ تا ۱۹:۰۰'];
@@ -245,11 +309,7 @@
                 edit: 'ویرایش',
                 delete: 'حذف',
                 save: 'ذخیره',
-                deleteConfirm: 'آیا از حذف درس مطمئن هستید؟',
-                examConflict: 'تداخل در زمان امتحان!',
-                sessionConflict: 'تداخل در زمان کلاس!',
-                coreqNotTaken: 'هم‌نیاز پاس نشده یا اخذ نشده است',
-                addedToTerm: 'به ترم اضافه شد'
+                deleteConfirm: 'آیا از حذف درس مطمئن هستید؟'
             },
             en: {
                 dashboard: 'Physics Undergraduate Course Management',
@@ -284,11 +344,7 @@
                 edit: 'Edit',
                 delete: 'Delete',
                 save: 'Save',
-                deleteConfirm: 'Are you sure you want to delete this course?',
-                examConflict: 'Exam time conflict!',
-                sessionConflict: 'Session time conflict!',
-                coreqNotTaken: 'Corequisite not taken or passed!',
-                addedToTerm: 'Added to term'
+                deleteConfirm: 'Are you sure you want to delete this course?'
             }
         };
 
@@ -316,10 +372,7 @@
         function showSection(section) {
             document.querySelectorAll('.section, #dashboard').forEach(el => el.classList.remove('active'));
             document.getElementById(section).classList.add('active');
-            if (section === 'registerCourses') {
-                console.log('Rendering courses section...');
-                renderCoursesTiles();
-            }
+            if (section === 'registerCourses') renderCoursesTiles();
             if (section === 'termsList') renderTermsList();
             if (section === 'reports') renderReports();
             if (section === 'calendar') renderCalendar();
@@ -390,7 +443,6 @@
 
         // نمایش تایل‌ها با انیمیشن
         function renderCoursesTiles(query = '') {
-            console.log('Rendering courses tiles with query:', query);
             const tilesDiv = document.getElementById('coursesTiles');
             tilesDiv.innerHTML = '';
             const typeOrder = ['عمومی', 'پایه', 'اصلی', 'اختیاری'];
@@ -403,10 +455,6 @@
                 if (typeDiff !== 0) return typeDiff;
                 return a.id.localeCompare(b.id);
             });
-            console.log('Filtered courses:', filteredCourses);
-            if (filteredCourses.length === 0) {
-                tilesDiv.innerHTML = '<p class="text-center">هیچ درسی یافت نشد!</p>';
-            }
             filteredCourses.forEach((course, index) => {
                 const tile = document.createElement('div');
                 tile.className = `tile col-md-3 ${course.type === 'عمومی' ? 'general' : course.type === 'پایه' ? 'base' : course.type === 'اصلی' ? 'main' : 'optional'}`;
@@ -457,7 +505,8 @@
                     <h5>${c.name} (${c.id}) - ${translations[currentLanguage].group}: ${c.group}</h5>
                     <p>${translations[currentLanguage].sessions}: ${c.sessions.map(s => `${s.day} ${s.time} (${s.location}) ${s.isAlternate ? '(زوج/فرد)' : ''}`).join(', ')}</p>
                     <p>${translations[currentLanguage].examTime}: ${c.examTime}</p>
-                    <label>${translations[currentLanguage].notes}: </label><textarea class="form-control" onchange="updateNotes(${index}, this.value, '${currentTermId}')">${c.notes || ''}</textarea>
+                    <label>${translations[currentLanguage].grade}: </label><input type="number" min="0" max="20" value="${c.grade || ''}" onchange="updateGrade(${index}, this.value, '${currentTermId}')" class="form-control d-inline-block w-auto">
+                    <p><label>${translations[currentLanguage].notes}: </label><textarea class="form-control" onchange="updateNotes(${index}, this.value, '${currentTermId}')">${c.notes || ''}</textarea></p>
                 `;
                 div.appendChild(item);
             });
@@ -493,11 +542,21 @@
                 }
             });
             term.gpa = totalUnits ? (totalWeighted / totalUnits).toFixed(2) : 0;
-            term.totalUnits = term.courses.reduce((sum, c) => sum + (c.grade >= 10 ? c.total : 0), 0);
+            term.totalUnits = term.courses.reduce((sum, c) => sum + c.total, 0);
             document.getElementById('termGPA').textContent = term.gpa;
             saveData();
             calculateOverallGPA();
             updateProgress();
+        }
+
+        function updateGrade(index, value, termId) {
+            const term = terms.find(t => t.id === termId);
+            term.courses[index].grade = parseFloat(value);
+            if (term.courses[index].grade >= 10 && !passedCourses.includes(term.courses[index].id)) {
+                passedCourses.push(term.courses[index].id);
+                showToast(`${term.courses[index].name} ${translations[currentLanguage].prereqPassed}!`);
+            }
+            calculateTermGPA(term);
         }
 
         function updateNotes(index, value, termId) {
@@ -646,7 +705,6 @@
                 document.getElementById('corequisites').value = course.corequisites;
                 document.getElementById('type').value = course.type;
                 courses = courses.filter(c => c.id !== id);
-                renderCoursesTiles();
             }
         }
 
@@ -697,7 +755,7 @@
             const reader = new FileReader();
             reader.onload = e => {
                 const data = JSON.parse(e.target.result);
-                courses = data.courses || [];
+                courses = data.courses || defaultCourses;
                 terms = data.terms || defaultTerms.map(t => ({ id: t, courses: [], totalUnits: 0, gpa: 0 }));
                 passedCourses = data.passedCourses || [];
                 saveData();
@@ -791,7 +849,7 @@
         // لود اولیه
         document.getElementById('languageToggle').value = currentLanguage;
         updateUIText();
-        loadCourses();
+        renderCoursesTiles();
         calculateOverallGPA();
         updateProgress();
         checkExamReminders();
