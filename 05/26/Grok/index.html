@@ -4,82 +4,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مدیریت دروس دانشجویی</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-        body { font-family: 'Tahoma', sans-serif; margin: 0; padding: 20px; background: #f4f4f4; }
-        .dashboard, .section { display: none; }
+        body { font-family: 'Tahoma', sans-serif; background: #f4f4f4; padding: 20px; }
+        .section { display: none; }
         .active { display: block; }
-        .loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; }
+        .loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1050; }
         .spinner { border: 16px solid #f3f3f3; border-top: 16px solid #3498db; border-radius: 50%; width: 120px; height: 120px; animation: spin 2s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .tile { border: 1px solid #ddd; padding: 10px; margin: 10px; width: 200px; border-radius: 8px; text-align: center; }
-        .tile img { width: 50px; } /* آیکون درس، مثلاً از یک URL */
-        .general { background: lightgreen; }
-        .base { background: lightblue; }
-        .main { background: lightcoral; }
-        .optional { background: lightyellow; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        @media (max-width: 600px) { .tile { width: 100%; } } /* موبایل */
+        .tile { border: 1px solid #ddd; padding: 15px; margin: 10px; border-radius: 8px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .general { background: #d4edda; } /* سبز روشن برای عمومی */
+        .base { background: #d1ecf1; } /* آبی روشن برای پایه */
+        .main { background: #f8d7da; } /* قرمز روشن برای اصلی */
+        .optional { background: #fff3cd; } /* زرد روشن برای اختیاری */
+        .tile img { width: 50px; margin-bottom: 10px; }
+        .courses-container { display: flex; flex-wrap: wrap; justify-content: center; }
+        table { margin-top: 20px; }
+        th, td { text-align: center; }
+        .schedule-block { background: #e2e3e5; padding: 5px; border-radius: 5px; }
+        @media (max-width: 768px) { .tile { width: 100%; margin: 10px 0; } } /* responsive برای موبایل */
     </style>
 </head>
 <body>
     <div id="loading" class="loading"><div class="spinner"></div></div>
-    <div id="dashboard" class="dashboard active">
-        <h1>داشبورد</h1>
-        <button onclick="showSection('registerCourses')">ثبت دروس</button>
-        <button onclick="showSection('termsList')">اطلاعات ترم‌ها</button>
-        <button onclick="showSection('reports')">گزارش‌های تحلیلی</button>
-        <p>معدل کل: <span id="overallGPA"></span></p>
-    </div>
-    <div id="registerCourses" class="section">
-        <h2>ثبت دروس</h2>
-        <form id="courseForm">
-            <input type="text" id="courseId" placeholder="شماره درس" required>
-            <input type="number" id="theoretical" placeholder="واحد تئوری" min="0" required>
-            <input type="number" id="practical" placeholder="واحد عملی" min="0" required>
-            <input type="text" id="prerequisites" placeholder="پیش‌نیازها (شماره‌ها با کاما)">
-            <input type="text" id="corequisites" placeholder="هم‌نیازها (شماره‌ها با کاما)">
-            <select id="type">
-                <option>عمومی</option><option>پایه</option><option>اصلی</option><option>اختیاری</option>
-            </select>
-            <button type="submit">ثبت</button>
-        </form>
-        <div id="coursesTiles" style="display: flex; flex-wrap: wrap;"></div>
-    </div>
-    <div id="termsList" class="section">
-        <h2>فهرست ترم‌ها</h2>
-        <ul id="termsUl"></ul>
-    </div>
-    <div id="termDetail" class="section">
-        <h2>جزئیات ترم <span id="termId"></span></h2>
-        <button onclick="addCourseToTerm()">اضافه کردن درس</button>
-        <div id="termCourses"></div>
-        <h3>برنامه هفتگی</h3>
-        <table id="weeklySchedule">
-            <tr><th>ساعت/روز</th><th>شنبه</th><th>یکشنبه</th><th>دوشنبه</th><th>سه‌شنبه</th><th>چهارشنبه</th><th>پنجشنبه</th><th>جمعه</th></tr>
-            <!-- سطرهای ساعت رو JS پر می‌کنه -->
-        </table>
-        <p>معدل ترم: <span id="termGPA"></span></p>
-    </div>
-    <div id="reports" class="section">
-        <h2>گزارش‌های تحلیلی</h2>
-        <canvas id="chart" width="400" height="200"></canvas> <!-- مثلاً با Chart.js -->
+    <div class="container">
+        <div id="dashboard" class="active">
+            <h1 class="text-center mb-4">داشبورد مدیریت دروس</h1>
+            <div class="row justify-content-center">
+                <div class="col-md-4"><button class="btn btn-primary w-100 mb-2" onclick="showSection('registerCourses')">ثبت دروس</button></div>
+                <div class="col-md-4"><button class="btn btn-info w-100 mb-2" onclick="showSection('termsList')">اطلاعات ترم‌ها</button></div>
+                <div class="col-md-4"><button class="btn btn-success w-100 mb-2" onclick="showSection('reports')">گزارش‌های تحلیلی</button></div>
+            </div>
+            <p class="text-center mt-4">معدل کل: <span id="overallGPA" class="fw-bold">0</span></p>
+        </div>
+        <div id="registerCourses" class="section">
+            <h2 class="text-center mb-4">ثبت دروس</h2>
+            <form id="courseForm" class="row g-3">
+                <div class="col-md-6"><input type="text" class="form-control" id="courseId" placeholder="شماره درس" required></div>
+                <div class="col-md-6"><input type="text" class="form-control" id="courseName" placeholder="نام درس" required></div>
+                <div class="col-md-4"><input type="number" class="form-control" id="theoretical" placeholder="واحد تئوری" min="0" required></div>
+                <div class="col-md-4"><input type="number" class="form-control" id="practical" placeholder="واحد عملی" min="0" required></div>
+                <div class="col-md-4">
+                    <select class="form-select" id="type">
+                        <option>عمومی</option><option>پایه</option><option>اصلی</option><option>اختیاری</option>
+                    </select>
+                </div>
+                <div class="col-md-6"><input type="text" class="form-control" id="prerequisites" placeholder="پیش‌نیازها (شماره‌ها با کاما)"></div>
+                <div class="col-md-6"><input type="text" class="form-control" id="corequisites" placeholder="هم‌نیازها (شماره‌ها با کاما)"></div>
+                <div class="col-12"><button type="submit" class="btn btn-primary w-100">ثبت درس</button></div>
+            </form>
+            <div id="coursesTiles" class="courses-container mt-4"></div>
+        </div>
+        <div id="termsList" class="section">
+            <h2 class="text-center mb-4">فهرست ترم‌ها</h2>
+            <ul id="termsUl" class="list-group"></ul>
+        </div>
+        <div id="termDetail" class="section">
+            <h2 class="text-center mb-4">جزئیات ترم <span id="termId"></span></h2>
+            <button class="btn btn-primary mb-3" onclick="showAddCourseModal()">اضافه کردن درس</button>
+            <div id="termCourses" class="list-group mb-4"></div>
+            <h3 class="mb-3">برنامه هفتگی</h3>
+            <table class="table table-bordered" id="weeklySchedule">
+                <thead><tr><th>ساعت/روز</th><th>شنبه</th><th>یکشنبه</th><th>دوشنبه</th><th>سه‌شنبه</th><th>چهارشنبه</th><th>پنجشنبه</th><th>جمعه</th></tr></thead>
+                <tbody></tbody>
+            </table>
+            <p class="text-center">معدل ترم: <span id="termGPA" class="fw-bold">0</span></p>
+        </div>
+        <div id="reports" class="section">
+            <h2 class="text-center mb-4">گزارش‌های تحلیلی</h2>
+            <canvas id="unitsChart" width="400" height="200" class="mb-4"></canvas>
+            <canvas id="gpaChart" width="400" height="200"></canvas>
+        </div>
     </div>
 
+    <!-- Modal برای اضافه کردن درس به ترم -->
+    <div class="modal fade" id="addCourseModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">اضافه کردن درس به ترم</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <form id="addCourseForm">
+                        <div class="mb-3">
+                            <label>درس:</label>
+                            <select id="selectCourse" class="form-select"></select>
+                        </div>
+                        <div class="mb-3"><label>گروه درسی:</label><input type="text" class="form-control" id="group" required></div>
+                        <div class="mb-3"><label>زمان امتحان:</label><input type="text" class="form-control" id="examTime" placeholder="مثال: ۱۴۰۴/۰۴/۱۵ ۱۰:۰۰" required></div>
+                        <div id="sessionsContainer" class="mb-3"></div>
+                        <button type="submit" class="btn btn-primary">اضافه کردن</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // ترم‌های پیش‌فرض
         const defaultTerms = ['۴۰۲۱', '۴۰۲۲', '۴۰۲۳', '۴۰۳۱', '۴۰۳۲', '۴۰۳۳', '۴۰۴۱', '۴۰۴۲', '۴۰۴۳', '۴۰۵۱', '۴۰۵۲', '۴۰۵۳', '۴۰۶۱', '۴۰۶۲', '۴۰۶۳'];
 
-        // دروس پیش‌فرض (مثل ترم‌ها، در کد بگذار)
+        // دروس پیش‌فرض با نام درس (نمونه‌های استاندارد برای رشته مهندسی کامپیوتر در ایران)
         const defaultCourses = [
-            { id: '101', theoretical: 3, practical: 0, total: 3, prerequisites: '', corequisites: '', type: 'عمومی' },
-            { id: '102', theoretical: 2, practical: 1, total: 3, prerequisites: '101', corequisites: '', type: 'پایه' },
-            // اضافه کن هر چی می‌خوای، مثلاً 10-20 تا
+            { id: '101', name: 'ریاضی عمومی ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '102', name: 'فیزیک عمومی ۱', theoretical: 3, practical: 1, total: 4, prerequisites: '', corequisites: '', type: 'پایه' },
+            { id: '103', name: 'برنامه‌نویسی مقدماتی', theoretical: 2, practical: 1, total: 3, prerequisites: '', corequisites: '', type: 'اصلی' },
+            { id: '104', name: 'زبان انگلیسی عمومی', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+            { id: '105', name: 'معماری کامپیوتر', theoretical: 3, practical: 0, total: 3, prerequisites: '103', corequisites: '', type: 'اصلی' },
+            { id: '106', name: 'ریاضی گسسته', theoretical: 3, practical: 0, total: 3, prerequisites: '101', corequisites: '', type: 'پایه' },
+            { id: '107', name: 'هوش مصنوعی', theoretical: 3, practical: 1, total: 4, prerequisites: '105', corequisites: '', type: 'اختیاری' },
+            { id: '108', name: 'پایگاه داده‌ها', theoretical: 3, practical: 1, total: 4, prerequisites: '103', corequisites: '', type: 'اصلی' },
+            { id: '109', name: 'شبکه‌های کامپیوتری', theoretical: 3, practical: 0, total: 3, prerequisites: '105', corequisites: '', type: 'اصلی' },
+            { id: '110', name: 'مهندسی نرم‌افزار', theoretical: 3, practical: 0, total: 3, prerequisites: '103', corequisites: '', type: 'اصلی' },
+            // می‌توانید درس‌های بیشتری اضافه کنید
         ];
 
         let courses = JSON.parse(localStorage.getItem('courses')) || defaultCourses;
         let terms = JSON.parse(localStorage.getItem('terms')) || defaultTerms.map(t => ({ id: t, courses: [], totalUnits: 0, gpa: 0 }));
         let passedCourses = JSON.parse(localStorage.getItem('passedCourses')) || [];
+
+        const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
+        const hours = Array.from({length: 15}, (_, i) => `${i + 7}:00 - ${i + 8}:00`); // از ۷ صبح تا ۱۰ شب
+
+        const addCourseModal = new bootstrap.Modal(document.getElementById('addCourseModal'));
+        let currentTermId = null;
 
         function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
@@ -88,21 +136,23 @@
             localStorage.setItem('courses', JSON.stringify(courses));
             localStorage.setItem('terms', JSON.stringify(terms));
             localStorage.setItem('passedCourses', JSON.stringify(passedCourses));
-            setTimeout(() => showLoading(false), 500); // شبیه‌سازی لود
+            setTimeout(() => showLoading(false), 500);
         }
 
         function showSection(section) {
-            document.querySelectorAll('.section, .dashboard').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.section, #dashboard').forEach(el => el.classList.remove('active'));
             document.getElementById(section).classList.add('active');
             if (section === 'registerCourses') renderCoursesTiles();
             if (section === 'termsList') renderTermsList();
+            if (section === 'reports') renderReports();
         }
 
-        // ثبت درس جدید
+        // ثبت درس جدید با نام
         document.getElementById('courseForm').addEventListener('submit', e => {
             e.preventDefault();
             const newCourse = {
                 id: document.getElementById('courseId').value,
+                name: document.getElementById('courseName').value,
                 theoretical: parseInt(document.getElementById('theoretical').value),
                 practical: parseInt(document.getElementById('practical').value),
                 total: parseInt(document.getElementById('theoretical').value) + parseInt(document.getElementById('practical').value),
@@ -110,32 +160,36 @@
                 corequisites: document.getElementById('corequisites').value,
                 type: document.getElementById('type').value
             };
-            if (!passedCourses.includes(newCourse.id)) {
-                courses.push(newCourse);
-                saveData();
-                renderCoursesTiles();
-            } else alert('درس پاس شده!');
+            if (passedCourses.includes(newCourse.id)) {
+                alert('این درس قبلاً پاس شده و نمی‌توان دوباره اضافه کرد!');
+                return;
+            }
+            courses.push(newCourse);
+            saveData();
+            renderCoursesTiles();
+            e.target.reset();
         });
 
-        // نمایش تایل‌ها با ترتیب
+        // نمایش تایل‌ها با ترتیب و ظاهر بهتر
         function renderCoursesTiles() {
             const tilesDiv = document.getElementById('coursesTiles');
             tilesDiv.innerHTML = '';
             const typeOrder = ['عمومی', 'پایه', 'اختیاری', 'اصلی'];
-            const sortedCourses = courses.sort((a, b) => {
-                if (typeOrder.indexOf(a.type) !== typeOrder.indexOf(b.type)) return typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type);
+            const sortedCourses = [...courses].sort((a, b) => {
+                const typeDiff = typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type);
+                if (typeDiff !== 0) return typeDiff;
                 return a.id.localeCompare(b.id);
             });
             sortedCourses.forEach(course => {
                 const tile = document.createElement('div');
-                tile.className = `tile ${course.type === 'عمومی' ? 'general' : course.type === 'پایه' ? 'base' : course.type === 'اصلی' ? 'main' : 'optional'}`;
+                tile.className = `tile col-md-3 ${course.type === 'عمومی' ? 'general' : course.type === 'پایه' ? 'base' : course.type === 'اصلی' ? 'main' : 'optional'}`;
                 tile.innerHTML = `
-                    <img src="https://example.com/icon.png" alt="درس"> <!-- آیکون دلخواه -->
-                    <p>شماره: ${course.id}</p>
+                    <img src="https://via.placeholder.com/50?text=درس" alt="آیکون درس">
+                    <h5>${course.name} (${course.id})</h5>
                     <p>تئوری: ${course.theoretical} | عملی: ${course.practical} | کل: ${course.total}</p>
                     <p>نوع: ${course.type}</p>
-                    <button onclick="editCourse('${course.id}')">ویرایش</button>
-                    <button onclick="deleteCourse('${course.id}')">حذف</button>
+                    <button class="btn btn-sm btn-warning" onclick="editCourse('${course.id}')">ویرایش</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteCourse('${course.id}')">حذف</button>
                 `;
                 tilesDiv.appendChild(tile);
             });
@@ -147,43 +201,230 @@
             ul.innerHTML = '';
             terms.forEach(term => {
                 const li = document.createElement('li');
+                li.className = 'list-group-item list-group-item-action';
                 li.innerHTML = `${term.id} - واحد کل: ${term.totalUnits}`;
                 li.onclick = () => showTermDetail(term.id);
                 ul.appendChild(li);
             });
         }
 
-        // جزئیات ترم (شامل اضافه درس، نمره، برنامه هفتگی، چک تداخل)
+        // جزئیات ترم
         function showTermDetail(termId) {
             showSection('termDetail');
+            currentTermId = termId;
             document.getElementById('termId').textContent = termId;
-            // کد برای رندر دروس ترم، جدول هفتگی، محاسبه GPA
-            // برای اضافه درس: یک فرم اینتراکتیو بساز که بر اساس واحد، فیلدهای جلسه بسازه
-            // چک: اگر زمان 10-12 دوشنبه باشه، alert بده
-            // اگر نمره >=10، به passedCourses اضافه کن و save
-            // برنامه هفتگی: بلاک‌ها رو در جدول بگذار (مثلاً span روی سلول‌ها)
+            const term = terms.find(t => t.id === termId);
+            renderTermCourses(term);
+            renderWeeklySchedule(term);
+            calculateTermGPA(term);
         }
 
-        // اضافه درس به ترم
-        function addCourseToTerm() {
-            // فرم انتخاب درس (فقط غیرپاس‌شده)، گروه، زمان‌ها (اینتراکتیو بر اساس واحد)، محل، امتحان
-            // محاسبه جلسات: مثلاً برای 3 تئوری: 2 فیلد، یکی ثابت، یکی زوج/فرد select
+        function renderTermCourses(term) {
+            const div = document.getElementById('termCourses');
+            div.innerHTML = '';
+            term.courses.forEach((c, index) => {
+                const item = document.createElement('div');
+                item.className = 'list-group-item';
+                item.innerHTML = `
+                    <h5>${c.name} (${c.id}) - گروه: ${c.group}</h5>
+                    <p>جلسات: ${c.sessions.map(s => `${s.day} ${s.time} (${s.location}) ${s.isAlternate ? '(زوج/فرد)' : ''}`).join(', ')}</p>
+                    <p>امتحان: ${c.examTime}</p>
+                    <label>نمره: </label><input type="number" min="0" max="20" value="${c.grade || ''}" onchange="updateGrade(${index}, this.value, '${currentTermId}')">
+                `;
+                div.appendChild(item);
+            });
         }
 
-        // ویرایش/حذف
-        function editCourse(id) { /* پیدا کن، فرم پر کن، آپدیت */ }
-        function deleteCourse(id) { courses = courses.filter(c => c.id !== id); saveData(); renderCoursesTiles(); }
+        function renderWeeklySchedule(term) {
+            const tbody = document.getElementById('weeklySchedule').querySelector('tbody');
+            tbody.innerHTML = '';
+            hours.forEach(hour => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${hour}</td>`;
+                days.forEach(day => {
+                    let cellContent = '';
+                    term.courses.forEach(c => {
+                        c.sessions.forEach(s => {
+                            if (s.day === day && s.time === hour) {
+                                cellContent = `<div class="schedule-block">${c.name}</div>`;
+                            }
+                        });
+                    });
+                    tr.innerHTML += `<td>${cellContent}</td>`;
+                });
+                tbody.appendChild(tr);
+            });
+        }
 
-        // محاسبه معدل کل
+        function calculateTermGPA(term) {
+            let totalWeighted = 0, totalUnits = 0;
+            term.courses.forEach(c => {
+                if (c.grade >= 10) {
+                    totalWeighted += c.grade * c.total;
+                    totalUnits += c.total;
+                }
+            });
+            term.gpa = totalUnits ? (totalWeighted / totalUnits).toFixed(2) : 0;
+            term.totalUnits = term.courses.reduce((sum, c) => sum + c.total, 0);
+            document.getElementById('termGPA').textContent = term.gpa;
+            saveData();
+            calculateOverallGPA();
+        }
+
+        function updateGrade(index, value, termId) {
+            const term = terms.find(t => t.id === termId);
+            term.courses[index].grade = parseFloat(value);
+            if (term.courses[index].grade >= 10) {
+                passedCourses.push(term.courses[index].id);
+            }
+            calculateTermGPA(term);
+        }
+
+        function showAddCourseModal() {
+            const select = document.getElementById('selectCourse');
+            select.innerHTML = '';
+            courses.forEach(c => {
+                if (!passedCourses.includes(c.id)) {
+                    const option = document.createElement('option');
+                    option.value = c.id;
+                    option.textContent = `${c.name} (${c.id})`;
+                    select.appendChild(option);
+                }
+            });
+            document.getElementById('sessionsContainer').innerHTML = '';
+            document.getElementById('selectCourse').onchange = generateSessionFields;
+            addCourseModal.show();
+        }
+
+        function generateSessionFields() {
+            const courseId = document.getElementById('selectCourse').value;
+            const course = courses.find(c => c.id === courseId);
+            if (!course) return;
+            const sessionsContainer = document.getElementById('sessionsContainer');
+            sessionsContainer.innerHTML = '<h6>جلسات کلاس:</h6>';
+            let sessionCount = course.practical; // هر واحد عملی = 1 جلسه 2 ساعته
+            sessionCount += Math.floor(course.theoretical / 2); // هر 2 واحد تئوری = 1 جلسه
+            if (course.theoretical % 2 === 1) { // برای 3 واحد: +1 جلسه alternate
+                sessionCount += 1;
+            }
+            for (let i = 0; i < sessionCount; i++) {
+                const div = document.createElement('div');
+                div.className = 'row mb-2';
+                div.innerHTML = `
+                    <div class="col-3"><select class="form-select" id="day${i}"><option>شنبه</option><option>یکشنبه</option><option>دوشنبه</option><option>سه‌شنبه</option><option>چهارشنبه</option><option>پنجشنبه</option><option>جمعه</option></select></div>
+                    <div class="col-3"><input type="text" class="form-control" id="time${i}" placeholder="ساعت (مثال: 10:00-12:00)" required></div>
+                    <div class="col-3"><input type="text" class="form-control" id="location${i}" placeholder="محل برگزاری" required></div>
+                    <div class="col-3"><select class="form-select" id="alternate${i}"><option value="none">ثابت</option><option value="even">زوج</option><option value="odd">فرد</option></select></div>
+                `;
+                sessionsContainer.appendChild(div);
+            }
+            if (course.theoretical % 2 === 1) {
+                // آخرین جلسه alternate است
+                const lastSelect = document.getElementById(`alternate${sessionCount - 1}`);
+                lastSelect.value = 'even'; // پیش‌فرض زوج
+            }
+        }
+
+        document.getElementById('addCourseForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const courseId = document.getElementById('selectCourse').value;
+            const course = {...courses.find(c => c.id === courseId)};
+            course.group = document.getElementById('group').value;
+            course.examTime = document.getElementById('examTime').value;
+            course.sessions = [];
+            const sessionCount = course.practical + Math.floor(course.theoretical / 2) + (course.theoretical % 2);
+            for (let i = 0; i < sessionCount; i++) {
+                const day = document.getElementById(`day${i}`).value;
+                const time = document.getElementById(`time${i}`).value;
+                const location = document.getElementById(`location${i}`).value;
+                const alternate = document.getElementById(`alternate${i}`).value;
+                if (time === '10:00-12:00' && day === 'دوشنبه') {
+                    alert('ساعت ۱۰ تا ۱۲ دوشنبه‌ها برای فعالیت فرهنگی رزرو شده و نمی‌توان کلاس ثبت کرد!');
+                    return;
+                }
+                // چک تداخل با جلسات موجود (ساده: فقط چک اگر همان زمان و روز باشه)
+                const term = terms.find(t => t.id === currentTermId);
+                const hasConflict = term.courses.some(existing => existing.sessions.some(s => s.day === day && s.time === time));
+                if (hasConflict) {
+                    alert('تداخل زمانی وجود دارد!');
+                    return;
+                }
+                course.sessions.push({ day, time, location, isAlternate: alternate !== 'none' ? alternate : null });
+            }
+            // چک پیش‌نیازها
+            const prereqs = course.prerequisites.split(',').filter(p => p);
+            for (let prereq of prereqs) {
+                if (!passedCourses.includes(prereq.trim())) {
+                    alert(`پیش‌نیاز ${prereq} پاس نشده!`);
+                    return;
+                }
+            }
+            const term = terms.find(t => t.id === currentTermId);
+            term.courses.push(course);
+            addCourseModal.hide();
+            renderTermCourses(term);
+            renderWeeklySchedule(term);
+            calculateTermGPA(term);
+            saveData();
+        });
+
+        function editCourse(id) {
+            const course = courses.find(c => c.id === id);
+            if (course) {
+                document.getElementById('courseId').value = course.id;
+                document.getElementById('courseName').value = course.name;
+                document.getElementById('theoretical').value = course.theoretical;
+                document.getElementById('practical').value = course.practical;
+                document.getElementById('prerequisites').value = course.prerequisites;
+                document.getElementById('corequisites').value = course.corequisites;
+                document.getElementById('type').value = course.type;
+                // برای ذخیره ویرایش، از همان فرم استفاده کن اما درس رو آپدیت کن
+                courses = courses.filter(c => c.id !== id); // حذف قدیمی
+            }
+        }
+
+        function deleteCourse(id) {
+            if (confirm('حذف درس؟')) {
+                courses = courses.filter(c => c.id !== id);
+                saveData();
+                renderCoursesTiles();
+            }
+        }
+
         function calculateOverallGPA() {
             let totalWeighted = 0, totalUnits = 0;
-            terms.forEach(term => { term.courses.forEach(c => { if (c.grade >= 10) { totalWeighted += c.grade * c.total; totalUnits += c.total; } }); });
+            terms.forEach(term => {
+                term.courses.forEach(c => {
+                    if (c.grade >= 10) {
+                        totalWeighted += c.grade * c.total;
+                        totalUnits += c.total;
+                    }
+                });
+            });
             document.getElementById('overallGPA').textContent = totalUnits ? (totalWeighted / totalUnits).toFixed(2) : 0;
         }
 
-        // گزارش: مثلاً با Chart.js (اسکریپت خارجی اضافه کن)
-        // <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        // در render: new Chart(ctx, { type: 'pie', data: { labels: types, datasets: [{ data: counts }] } });
+        function renderReports() {
+            // چارت واحدهای بر اساس نوع
+            const ctxUnits = document.getElementById('unitsChart').getContext('2d');
+            const types = ['عمومی', 'پایه', 'اصلی', 'اختیاری'];
+            const unitsByType = types.map(type => courses.filter(c => c.type === type).reduce((sum, c) => sum + c.total, 0));
+            new Chart(ctxUnits, {
+                type: 'pie',
+                data: { labels: types, datasets: [{ data: unitsByType, backgroundColor: ['#d4edda', '#d1ecf1', '#f8d7da', '#fff3cd'] }] },
+                options: { title: { display: true, text: 'واحدهای دروس بر اساس نوع' } }
+            });
+
+            // چارت معدل ترم‌ها
+            const ctxGPA = document.getElementById('gpaChart').getContext('2d');
+            const termIds = terms.map(t => t.id);
+            const gpas = terms.map(t => t.gpa);
+            new Chart(ctxGPA, {
+                type: 'line',
+                data: { labels: termIds, datasets: [{ label: 'معدل ترم', data: gpas, borderColor: '#3498db' }] },
+                options: { scales: { y: { beginAtZero: true, max: 20 } } }
+            });
+        }
 
         // ابتدایی لود
         renderCoursesTiles();
