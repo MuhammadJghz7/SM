@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>ثبت دروس</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="default-courses.js"></script>
+</head>
+<body>
+  <h1>➕ ثبت و مدیریت دروس</h1>
+  <form id="addCourseForm">
+    <input type="text" id="courseName" placeholder="نام درس" required>
+    <input type="number" id="courseCode" placeholder="کد درس" required>
+    <input type="number" id="coursePractical" placeholder="واحد عملی" min="0" required>
+    <input type="number" id="courseTheory" placeholder="واحد تئوری" min="0" required>
+    <select id="courseType" required>
+      <option value="">نوع درس</option>
+      <option value="عمومی">عمومی</option>
+      <option value="پایه">پایه</option>
+      <option value="اختیاری">اختیاری</option>
+      <option value="اصلی">اصلی</option>
+    </select>
+    <button type="submit">ثبت درس</button>
+  </form>
+
+  <div class="course-container" id="courseList"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
