@@ -1,25 +1,5 @@
 [
     {
-        "id": "001",
-        "name": "اندیشه اسلامی ۱ (مبدا و معاد)",
-        "theoretical": 2,
-        "practical": 0,
-        "total": 2,
-        "prerequisites": "",
-        "corequisites": "",
-        "type": "عمومی"
-    },
-    {
-        "id": "002",
-        "name": "اندیشه اسلامی ۲ (نبوت و امامت)",
-        "theoretical": 2,
-        "practical": 0,
-        "total": 2,
-        "prerequisites": "",
-        "corequisites": "",
-        "type": "عمومی"
-    },
-    {
         "id": "003",
         "name": "انسان در اسلام",
         "theoretical": 2,
