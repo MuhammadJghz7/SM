@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>جزئیات ترم</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1 id="termTitle">📅 ترم</h1>
+
+  <div>
+    <h2>➕ افزودن درس به ترم</h2>
+    <select id="availableCourses"></select>
+    <input type="text" id="group" placeholder="گروه درسی">
+    <input type="text" id="exam" placeholder="زمان امتحان">
+    <button id="addToTerm">افزودن</button>
+  </div>
+
+  <h2>📋 دروس این ترم</h2>
+  <ul id="termCourses"></ul>
+
+  <h2>📅 برنامه هفتگی</h2>
+  <div class="schedule" id="schedule"></div>
+
+  <script src="default-courses.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
