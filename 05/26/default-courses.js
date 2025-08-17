@@ -4,4 +4,5 @@ const defaultCourses = [
   { name: "زبان عمومی", code: 201, practical: 0, theory: 2, type: "عمومی" },
   { name: "مبانی برنامه‌نویسی", code: 301, practical: 1, theory: 2, type: "اصلی" },
   { name: "آز فیزیک ۱", code: 401, practical: 1, theory: 0, type: "اختیاری" }
+  { name: “مکانیک تحیلی ۱”, code: 501, practical: 0, theory: 3, type: “اصلی” }
 ];
