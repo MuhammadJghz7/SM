@@ -161,7 +161,7 @@
         // ترم‌های پیش‌فرض
         const defaultTerms = ['۴۰۲۱', '۴۰۲۲', '۴۰۲۳', '۴۰۳۱', '۴۰۳۲', '۴۰۳۳', '۴۰۴۱', '۴۰۴۲', '۴۰۴۳', '۴۰۵۱', '۴۰۵۲', '۴۰۵۳', '۴۰۶۱', '۴۰۶۲', '۴۰۶۳'];
 
-// بارگذاری دروس از فایل JSON
+        // بارگذاری دروس از فایل JSON
         let courses = [];
         let terms = JSON.parse(localStorage.getItem('terms')) || defaultTerms.map(t => ({ id: t, courses: [], totalUnits: 0, gpa: 0 }));
         let passedCourses = JSON.parse(localStorage.getItem('passedCourses')) || [];
@@ -184,7 +184,6 @@
             }
         }
 
-        
         const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه'];
         const hours = ['۸:۰۰ تا ۱۰:۰۰', '۱۰:۰۰ تا ۱۲:۰۰', '۱۳:۰۰ تا ۱۵:۰۰', '۱۵:۰۰ تا ۱۷:۰۰', '۱۷:۰۰ تا ۱۹:۰۰'];
         const addCourseModal = new bootstrap.Modal(document.getElementById('addCourseModal'));
@@ -225,7 +224,11 @@
                 edit: 'ویرایش',
                 delete: 'حذف',
                 save: 'ذخیره',
-                deleteConfirm: 'آیا از حذف درس مطمئن هستید؟'
+                deleteConfirm: 'آیا از حذف درس مطمئن هستید؟',
+                examConflict: 'تداخل در زمان امتحان!',
+                sessionConflict: 'تداخل در زمان کلاس!',
+                coreqNotTaken: 'هم‌نیاز پاس نشده یا اخذ نشده است',
+                addedToTerm: 'به ترم اضافه شد'
             },
             en: {
                 dashboard: 'Physics Undergraduate Course Management',
@@ -260,7 +263,11 @@
                 edit: 'Edit',
                 delete: 'Delete',
                 save: 'Save',
-                deleteConfirm: 'Are you sure you want to delete this course?'
+                deleteConfirm: 'Are you sure you want to delete this course?',
+                examConflict: 'Exam time conflict!',
+                sessionConflict: 'Session time conflict!',
+                coreqNotTaken: 'Corequisite not taken or passed!',
+                addedToTerm: 'Added to term'
             }
         };
 
@@ -671,7 +678,7 @@
             const reader = new FileReader();
             reader.onload = e => {
                 const data = JSON.parse(e.target.result);
-                courses = data.courses || defaultCourses;
+                courses = data.courses || [];
                 terms = data.terms || defaultTerms.map(t => ({ id: t, courses: [], totalUnits: 0, gpa: 0 }));
                 passedCourses = data.passedCourses || [];
                 saveData();
@@ -765,7 +772,7 @@
         // لود اولیه
         document.getElementById('languageToggle').value = currentLanguage;
         updateUIText();
-        renderCoursesTiles();
+        loadCourses();
         calculateOverallGPA();
         updateProgress();
         checkExamReminders();
