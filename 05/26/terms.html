@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>ترم‌ها</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>📚 ترم‌ها</h1>
+  <ul id="termList"></ul>
+
+  <script>
+    const terms = [
+      "۴۰۲۱","۴۰۲۲","۴۰۲۳",
+      "۴۰۳۱","۴۰۳۲","۴۰۳۳",
+      "۴۰۴۱","۴۰۴۲","۴۰۴۳",
+      "۴۰۵۱","۴۰۵۲","۴۰۵۳",
+      "۴۰۶۱","۴۰۶۲","۴۰۶۳"
+    ];
+
+    const list = document.getElementById("termList");
+    terms.forEach(t => {
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="term-detail.html?term=${t}">ترم ${t}</a>`;
+      list.appendChild(li);
+    });
+  </script>
+</body>
+</html>
