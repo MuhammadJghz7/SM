@@ -184,11 +184,7 @@
             }
         }
 
-        let courses = JSON.parse(localStorage.getItem('courses')) || defaultCourses;
-        let terms = JSON.parse(localStorage.getItem('terms')) || defaultTerms.map(t => ({ id: t, courses: [], totalUnits: 0, gpa: 0 }));
-        let passedCourses = JSON.parse(localStorage.getItem('passedCourses')) || [];
-        let currentLanguage = localStorage.getItem('language') || 'fa';
-
+        
         const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه'];
         const hours = ['۸:۰۰ تا ۱۰:۰۰', '۱۰:۰۰ تا ۱۲:۰۰', '۱۳:۰۰ تا ۱۵:۰۰', '۱۵:۰۰ تا ۱۷:۰۰', '۱۷:۰۰ تا ۱۹:۰۰'];
         const addCourseModal = new bootstrap.Modal(document.getElementById('addCourseModal'));
