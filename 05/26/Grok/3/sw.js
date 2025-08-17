@@ -2,7 +2,7 @@ const CACHE_NAME = 'physics-student-app-v1';
 const urlsToCache = [
     '/',
     '/index.html',
-    '/courses.json', // اضافه کردن فایل دروس
+    '/courses.json',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
     'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css',
     'https://cdn.fontcdn.ir/Font/Persian/Vazirmatn/Vazirmatn-Regular.woff2',
