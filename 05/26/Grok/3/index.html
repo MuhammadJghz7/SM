@@ -161,24 +161,45 @@
         // ترم‌های پیش‌فرض
         const defaultTerms = ['۴۰۲۱', '۴۰۲۲', '۴۰۲۳', '۴۰۳۱', '۴۰۳۲', '۴۰۳۳', '۴۰۴۱', '۴۰۴۲', '۴۰۴۳', '۴۰۵۱', '۴۰۵۲', '۴۰۵۳', '۴۰۶۱', '۴۰۶۲', '۴۰۶۳'];
 
-        // بارگذاری دروس از فایل JSON
+        // متغیرهای اصلی
         let courses = [];
         let terms = JSON.parse(localStorage.getItem('terms')) || defaultTerms.map(t => ({ id: t, courses: [], totalUnits: 0, gpa: 0 }));
         let passedCourses = JSON.parse(localStorage.getItem('passedCourses')) || [];
         let currentLanguage = localStorage.getItem('language') || 'fa';
 
+        // تابع بارگذاری دروس
         async function loadCourses() {
             showLoading(true);
             try {
+                console.log('Attempting to fetch courses.json...');
                 const response = await fetch('courses.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
                 courses = await response.json();
+                console.log('Courses loaded:', courses);
                 saveData();
                 renderCoursesTiles();
                 calculateOverallGPA();
                 updateProgress();
             } catch (error) {
                 console.error('Error loading courses:', error);
-                showToast('خطا در بارگذاری دروس!');
+                showToast('خطا در بارگذاری دروس: ' + error.message);
+                // داده‌های نمونه برای تست
+                courses = [
+                    {
+                        id: "001",
+                        name: "تست درس ۱",
+                        theoretical: 2,
+                        practical: 0,
+                        total: 2,
+                        prerequisites: "",
+                        corequisites: "",
+                        type: "عمومی"
+                    }
+                ];
+                console.log('Falling back to sample courses:', courses);
+                renderCoursesTiles();
             } finally {
                 showLoading(false);
             }
@@ -295,7 +316,10 @@
         function showSection(section) {
             document.querySelectorAll('.section, #dashboard').forEach(el => el.classList.remove('active'));
             document.getElementById(section).classList.add('active');
-            if (section === 'registerCourses') renderCoursesTiles();
+            if (section === 'registerCourses') {
+                console.log('Rendering courses section...');
+                renderCoursesTiles();
+            }
             if (section === 'termsList') renderTermsList();
             if (section === 'reports') renderReports();
             if (section === 'calendar') renderCalendar();
@@ -366,6 +390,7 @@
 
         // نمایش تایل‌ها با انیمیشن
         function renderCoursesTiles(query = '') {
+            console.log('Rendering courses tiles with query:', query);
             const tilesDiv = document.getElementById('coursesTiles');
             tilesDiv.innerHTML = '';
             const typeOrder = ['عمومی', 'پایه', 'اصلی', 'اختیاری'];
@@ -378,6 +403,10 @@
                 if (typeDiff !== 0) return typeDiff;
                 return a.id.localeCompare(b.id);
             });
+            console.log('Filtered courses:', filteredCourses);
+            if (filteredCourses.length === 0) {
+                tilesDiv.innerHTML = '<p class="text-center">هیچ درسی یافت نشد!</p>';
+            }
             filteredCourses.forEach((course, index) => {
                 const tile = document.createElement('div');
                 tile.className = `tile col-md-3 ${course.type === 'عمومی' ? 'general' : course.type === 'پایه' ? 'base' : course.type === 'اصلی' ? 'main' : 'optional'}`;
@@ -428,8 +457,7 @@
                     <h5>${c.name} (${c.id}) - ${translations[currentLanguage].group}: ${c.group}</h5>
                     <p>${translations[currentLanguage].sessions}: ${c.sessions.map(s => `${s.day} ${s.time} (${s.location}) ${s.isAlternate ? '(زوج/فرد)' : ''}`).join(', ')}</p>
                     <p>${translations[currentLanguage].examTime}: ${c.examTime}</p>
-                    <label>${translations[currentLanguage].grade}: </label><input type="number" min="0" max="20" value="${c.grade || ''}" onchange="updateGrade(${index}, this.value, '${currentTermId}')" class="form-control d-inline-block w-auto">
-                    <p><label>${translations[currentLanguage].notes}: </label><textarea class="form-control" onchange="updateNotes(${index}, this.value, '${currentTermId}')">${c.notes || ''}</textarea></p>
+                    <label>${translations[currentLanguage].notes}: </label><textarea class="form-control" onchange="updateNotes(${index}, this.value, '${currentTermId}')">${c.notes || ''}</textarea>
                 `;
                 div.appendChild(item);
             });
@@ -465,21 +493,11 @@
                 }
             });
             term.gpa = totalUnits ? (totalWeighted / totalUnits).toFixed(2) : 0;
-            term.totalUnits = term.courses.reduce((sum, c) => sum + c.total, 0);
+            term.totalUnits = term.courses.reduce((sum, c) => sum + (c.grade >= 10 ? c.total : 0), 0);
             document.getElementById('termGPA').textContent = term.gpa;
             saveData();
             calculateOverallGPA();
             updateProgress();
-        }
-
-        function updateGrade(index, value, termId) {
-            const term = terms.find(t => t.id === termId);
-            term.courses[index].grade = parseFloat(value);
-            if (term.courses[index].grade >= 10 && !passedCourses.includes(term.courses[index].id)) {
-                passedCourses.push(term.courses[index].id);
-                showToast(`${term.courses[index].name} ${translations[currentLanguage].prereqPassed}!`);
-            }
-            calculateTermGPA(term);
         }
 
         function updateNotes(index, value, termId) {
@@ -628,6 +646,7 @@
                 document.getElementById('corequisites').value = course.corequisites;
                 document.getElementById('type').value = course.type;
                 courses = courses.filter(c => c.id !== id);
+                renderCoursesTiles();
             }
         }
 
