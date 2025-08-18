@@ -103,8 +103,19 @@
             <div id="coursesTiles" class="courses-container mt-4"></div>
         </div>
         <div id="termsList" class="section">
-            <h2 class="text-center mb-4">فهرست ترم‌ها</h2>
-            <ul id="termsUl" class="list-group"></ul>
+            <h2 class="text-center mb-4">اطلاعات ترم‌ها</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ترم</th>
+                        <th>معدل</th>
+                        <th>واحد کل</th>
+                        <th>واحد پاس شده</th>
+                        <th>واحد حذف شده</th>
+                    </tr>
+                </thead>
+                <tbody id="termsTableBody"></tbody>
+            </table>
         </div>
         <div id="termDetail" class="section">
             <h2 class="text-center mb-4">جزئیات ترم <span id="termId"></span></h2>
@@ -459,14 +470,18 @@
 
         // فهرست ترم‌ها
         function renderTermsList() {
-            const ul = document.getElementById('termsUl');
-            ul.innerHTML = '';
+            const tbody = document.getElementById('termsTableBody');
+            tbody.innerHTML = '';
             terms.forEach(term => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item list-group-item-action';
-                li.innerHTML = `${term.id} - ${translations[currentLanguage].passedUnits}: ${term.totalUnits}`;
-                li.onclick = () => showTermDetail(term.id);
-                ul.appendChild(li);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td onclick="showTermDetail('${term.id}')">${term.id}</td>
+                    <td>${term.gpa || 0}</td>
+                    <td>${term.totalUnits}</td>
+                    <td>${term.passedUnits || 0}</td>
+                    <td>${term.droppedUnits || 0}</td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 
@@ -485,17 +500,31 @@
             const div = document.getElementById('termCourses');
             div.innerHTML = '';
             term.courses.forEach((c, index) => {
+                if (c.dropped) return; // درس حذف‌شده نمایش داده نمی‌شود
                 const item = document.createElement('div');
                 item.className = 'list-group-item';
                 item.innerHTML = `
-                    <h5>${c.name} (${c.id}) - ${translations[currentLanguage].group}: ${c.group}</h5>
-                    <p>${translations[currentLanguage].sessions}: ${c.sessions.map(s => `${s.day} ${s.time} (${s.location}) ${s.isAlternate ? '(زوج/فرد)' : ''}`).join(', ')}</p>
-                    <p>${translations[currentLanguage].examTime}: ${c.examTime}</p>
-                    <label>${translations[currentLanguage].grade}: </label><input type="number" min="0" max="20" value="${c.grade || ''}" onchange="updateGrade(${index}, this.value, '${currentTermId}')" class="form-control d-inline-block w-auto">
-                    <p><label>${translations[currentLanguage].notes}: </label><textarea class="form-control" onchange="updateNotes(${index}, this.value, '${currentTermId}')">${c.notes || ''}</textarea></p>
+                    <h5>${c.name} (${c.id}) - گروه: ${c.group}</h5>
+                    <p>جلسات: ${c.sessions.map(s => `${s.day} ${s.time} (${s.location}) ${s.isAlternate ? '(زوج/فرد)' : ''}`).join(', ')}</p>
+                    <p>امتحان: ${c.examTime}</p>
+                    <label>نمره: </label><input type="number" min="0" max="20" value="${c.grade || ''}" onchange="updateGrade(${index}, this.value, '${currentTermId}')" class="form-control d-inline-block w-auto">
+                    <p><label>یادداشت: </label><textarea class="form-control" onchange="updateNotes(${index}, this.value, '${currentTermId}')">${c.notes || ''}</textarea></p>
+                    <button class="btn btn-danger btn-sm" onclick="emergencyDrop(${index}, '${currentTermId}')">حذف اضطراری</button>
                 `;
                 div.appendChild(item);
             });
+        }
+
+        function emergencyDrop(index, termId) {
+            if (confirm('آیا از حذف اضطراری درس مطمئن هستید؟')) {
+                const term = terms.find(t => t.id === termId);
+                term.courses[index].dropped = true;
+                term.courses[index].grade = undefined; // نمره حذف می‌شود
+                saveData();
+                showTermDetail(termId);
+                calculateTermGPA(term);
+                renderTermsList();
+            }
         }
 
         function renderWeeklySchedule(term) {
@@ -520,19 +549,27 @@
         }
 
         function calculateTermGPA(term) {
-            let totalWeighted = 0, totalUnits = 0;
+            let totalWeighted = 0, totalUnits = 0, passedUnits = 0, droppedUnits = 0;
             term.courses.forEach(c => {
-                if (c.grade >= 10) {
-                    totalWeighted += c.grade * c.total;
+                if (c.dropped) {
+                    droppedUnits += c.total;
+                } else {
                     totalUnits += c.total;
+                    if (c.grade !== undefined) {
+                        totalWeighted += c.grade * c.total;
+                        if (c.grade >= 10) passedUnits += c.total;
+                    }
                 }
             });
             term.gpa = totalUnits ? (totalWeighted / totalUnits).toFixed(2) : 0;
-            term.totalUnits = term.courses.reduce((sum, c) => sum + c.total, 0);
+            term.totalUnits = totalUnits + passedUnits + droppedUnits; // واحد کل شامل همه است
+            term.passedUnits = passedUnits;
+            term.droppedUnits = droppedUnits;
             document.getElementById('termGPA').textContent = term.gpa;
             saveData();
             calculateOverallGPA();
             updateProgress();
+            renderTermsList();
         }
 
         function updateGrade(index, value, termId) {
@@ -703,16 +740,17 @@
         }
 
         function calculateOverallGPA() {
-            let totalWeighted = 0, totalUnits = 0;
+            let totalWeighted = 0, totalPassedUnits = 0;
             terms.forEach(term => {
                 term.courses.forEach(c => {
-                    if (c.grade >= 10) {
+                    if (c.grade >= 10 && !c.dropped) {
                         totalWeighted += c.grade * c.total;
-                        totalUnits += c.total;
+                        totalPassedUnits += c.total;
                     }
                 });
             });
-            document.getElementById('overallGPA').textContent = totalUnits ? (totalWeighted / totalUnits).toFixed(2) : 0;
+            const overallGPA = totalPassedUnits ? (totalWeighted / totalPassedUnits).toFixed(2) : 0;
+        document.getElementById('overallGPA').textContent = overallGPA;
         }
 
         function updateProgress() {
