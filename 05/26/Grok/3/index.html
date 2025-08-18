@@ -262,6 +262,11 @@
         ];
 
         let courses = JSON.parse(localStorage.getItem('courses')) || defaultCourses;
+        renderCoursesTiles();
+        calculateOverallGPA();
+        updateProgress();
+        renderReports();
+        renderCalendar();
         let terms = JSON.parse(localStorage.getItem('terms')) || defaultTerms.map(t => ({ id: t, courses: [], totalUnits: 0, gpa: 0 }));
         let passedCourses = JSON.parse(localStorage.getItem('passedCourses')) || [];
         let currentLanguage = localStorage.getItem('language') || 'fa';
