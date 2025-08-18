@@ -172,63 +172,75 @@
         // ترم‌های پیش‌فرض
         const defaultTerms = ['۴۰۲۱', '۴۰۲۲', '۴۰۲۳', '۴۰۳۱', '۴۰۳۲', '۴۰۳۳', '۴۰۴۱', '۴۰۴۲', '۴۰۴۳', '۴۰۵۱', '۴۰۵۲', '۴۰۵۳', '۴۰۶۱', '۴۰۶۲', '۴۰۶۳'];
 
-        // درس‌های پیش‌فرض
-        const defaultCourses = [
-            {
-                id: "001",
-                name: "اندیشه اسلامی ۱ (مبدا و معاد)",
-                theoretical: 2,
-                practical: 0,
-                total: 2,
-                prerequisites: "",
-                corequisites: "",
-                type: "عمومی"
-            },
-            {
-                id: "002",
-                name: "اندیشه اسلامی ۲ (نبوت و امامت)",
-                theoretical: 2,
-                practical: 0,
-                total: 2,
-                prerequisites: "",
-                corequisites: "",
-                type: "عمومی"
-            },
-            {
-                id: "003",
-                name: "انسان در اسلام",
-                theoretical: 2,
-                practical: 0,
-                total: 2,
-                prerequisites: "",
-                corequisites: "",
-                type: "عمومی"
-            },
-            {
-                id: "180122",
-                name: "شیمی عمومی",
-                theoretical: 3,
-                practical: 0,
-                total: 3,
-                prerequisites: "",
-                corequisites: "",
-                type: "پایه"
-            }
-            // سایر درس‌ها را می‌توانید اینجا اضافه کنید
-        ];
-
         // متغیرهای اصلی
-        let courses = JSON.parse(localStorage.getItem('courses')) || defaultCourses;
+        let courses = [];
         let terms = JSON.parse(localStorage.getItem('terms')) || defaultTerms.map(t => ({ id: t, courses: [], totalUnits: 0, gpa: 0, passedUnits: 0, droppedUnits: 0 }));
         let passedCourses = JSON.parse(localStorage.getItem('passedCourses')) || [];
         let currentLanguage = localStorage.getItem('language') || 'fa';
 
-        // رندر اولیه
-        renderCoursesTiles();
-        calculateOverallGPA();
-        updateProgress();
-        renderReports();
-        renderCalendar();
+        // بارگذاری دروس و رندر اولیه
+        function loadCourses() {
+            showLoading(true);
+            try {
+                console.log('Loading predefined courses...');
+                courses = [
+                    {
+                        id: "001",
+                        name: "اندیشه اسلامی ۱ (مبدا و معاد)",
+                        theoretical: 2,
+                        practical: 0,
+                        total: 2,
+                        prerequisites: "",
+                        corequisites: "",
+                        type: "عمومی"
+                    },
+                    {
+                        id: "002",
+                        name: "اندیشه اسلامی ۲ (نبوت و امامت)",
+                        theoretical: 2,
+                        practical: 0,
+                        total: 2,
+                        prerequisites: "",
+                        corequisites: "",
+                        type: "عمومی"
+                    },
+                    {
+                        id: "003",
+                        name: "انسان در اسلام",
+                        theoretical: 2,
+                        practical: 0,
+                        total: 2,
+                        prerequisites: "",
+                        corequisites: "",
+                        type: "عمومی"
+                    },
+                    {
+                        id: "180122",
+                        name: "شیمی عمومی",
+                        theoretical: 3,
+                        practical: 0,
+                        total: 3,
+                        prerequisites: "",
+                        corequisites: "",
+                        type: "پایه"
+                    }
+                    // سایر درس‌ها را می‌توانید اینجا اضافه کنید
+                ];
+                console.log('Courses loaded:', courses);
+                saveData();
+                renderCoursesTiles();
+                calculateOverallGPA();
+                updateProgress();
+                renderReports();
+                renderCalendar();
+                updateUIText();
+            } catch (error) {
+                console.error('Error loading courses:', error);
+                showToast('خطا در بارگذاری دروس!');
+            } finally {
+                showLoading(false);
+            }
+        }
 
         const days = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه'];
         const hours = ['۸:۰۰ تا ۱۰:۰۰', '۱۰:۰۰ تا ۱۲:۰۰', '۱۳:۰۰ تا ۱۵:۰۰', '۱۵:۰۰ تا ۱۷:۰۰', '۱۷:۰۰ تا ۱۹:۰۰'];
@@ -768,7 +780,7 @@
             const reader = new FileReader();
             reader.onload = e => {
                 const data = JSON.parse(e.target.result);
-                courses = data.courses || defaultCourses;
+                courses = data.courses || [];
                 terms = data.terms || defaultTerms.map(t => ({ id: t, courses: [], totalUnits: 0, gpa: 0, passedUnits: 0, droppedUnits: 0 }));
                 passedCourses = data.passedCourses || [];
                 saveData();
@@ -800,7 +812,7 @@
             if (!('Notification' in window)) return;
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted') {
-                    const now = new Date();
+                    const now = new Date('2025-08-18T03:42:00'); // زمان فعلی
                     terms.forEach(term => {
                         term.courses.forEach(c => {
                             if (!c.dropped) {
@@ -831,4 +843,41 @@
             const gpas = terms.map(t => t.gpa || 0);
             new Chart(ctxGPA, {
                 type: 'line',
-                data: { labels: termIds, datasets: [{ label: translations[currentLanguage].termGPA, data: gpas, borderColor: '#3498db', fill
+                data: { labels: termIds, datasets: [{ label: translations[currentLanguage].termGPA, data: gpas, borderColor: '#3498db', fill: false }] },
+                options: { scales: { y: { beginAtZero: true, max: 20 } } }
+            });
+
+            const ctxGrades = document.getElementById('gradesChart').getContext('2d');
+            const gradesByType = types.map(type => {
+                const grades = terms.flatMap(t => t.courses.filter(c => c.type === type && !c.dropped && c.grade !== undefined).map(c => c.grade));
+                return grades.length ? (grades.reduce((sum, g) => sum + g, 0) / grades.length).toFixed(2) : 0;
+            });
+            new Chart(ctxGrades, {
+                type: 'bar',
+                data: { labels: types, datasets: [{ label: translations[currentLanguage].avgGrade, data: gradesByType, backgroundColor: '#28a745' }] },
+                options: { scales: { y: { beginAtZero: true, max: 20 } } }
+            });
+        }
+
+        // حالت تاریک
+        function toggleDarkMode() {
+            const isDark = document.getElementById('darkModeToggle').checked;
+            document.body.classList.toggle('dark-mode', isDark);
+            localStorage.setItem('darkMode', isDark);
+        }
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.getElementById('darkModeToggle').checked = true;
+            document.body.classList.add('dark-mode');
+        }
+
+        // آفلاین
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+
+        // لود اولیه
+        document.getElementById('languageToggle').value = currentLanguage;
+        loadCourses();
+    </script>
+</body>
+</html>
