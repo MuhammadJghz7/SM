@@ -194,7 +194,24 @@
                     { id: '1238501', name: 'زبان خارجی (عمومی)', theoretical: 3, practical: 0, total: 3, prerequisites: '', corequisites: '', type: 'عمومی' },
                     { id: '1316229', name: 'تربیت بدنی (کارشناسی)', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '', type: 'عمومی' },
                     { id: '1316225', name: 'ورزش ۱', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '', type: 'عمومی' },
-                    { id: '1142501', name: 'دانش خانواده و جمعیت', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' }
+                    { id: '1142501', name: 'دانش خانواده و جمعیت', theoretical: 2, practical: 0, total: 2, prerequisites: '', corequisites: '', type: 'عمومی' },
+                    
+                    { id: '1418118', name: 'شیمی عمومی', theoretical: 3, practical: 0, total: 3, prerequisites: '', corequisites: '', type: 'پایه' },
+                    { id: '1418002', name: 'آزمایشگاه شیمی عمومی', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '1418118', type: 'پایه' },
+                    { id: '1414117', name: 'ریاضی عمومی ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '', corequisites: '', type: 'پایه' },
+                    { id: '1414118', name: 'ریاضی عمومی ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '1414117', corequisites: '', type: 'پایه' },
+                    { id: '1414209', name: 'معادلات دیفرانسیل', theoretical: 3, practical: 0, total: 3, prerequisites: '1414118', corequisites: '', type: 'پایه' },
+                    { id: '1422121', name: 'فیزیک عمومی ۱', theoretical: 3, practical: 0, total: 3, prerequisites: '', corequisites: '', type: 'پایه' },
+                    { id: '1422132', name: 'فیزیک عمومی ۲', theoretical: 3, practical: 0, total: 3, prerequisites: '180114', corequisites: '', type: 'پایه' },
+                    { id: '1422133', name: 'فیزیک عمومی ۳', theoretical: 3, practical: 0, total: 3, prerequisites: '180115', corequisites: '', type: 'پایه' },
+                    { id: '1422200', name: 'فیزیک عمومی ۴', theoretical: 3, practical: 0, total: 3, prerequisites: '180116', corequisites: '', type: 'پایه' },
+                    { id: '1422103', name: 'آزمایشگاه فیزیک پایه ۱', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '1422121', type: 'پایه' },
+                    { id: '1422104', name: 'آزمایشگاه فیزیک پایه ۲', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '1422132', type: 'پایه' },
+                    { id: '1422206', name: 'آزمایشگاه فیزیک پایه ۳', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '1422133', type: 'پایه' },
+                    { id: '1422211', name: 'آزمایشگاه فیزیک پایه ۴', theoretical: 0, practical: 2, total: 2, prerequisites: '', corequisites: '1422200', type: 'پایه' },
+                    { id: '1422139', name: 'برنامه نویسی کامپیوتر', theoretical: 2, practical: 1, total: 3, prerequisites: '', corequisites: '', type: 'پایه' },
+                    { id: '1422136', name: 'کارگاه ماشین‌افزار', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '', type: 'پایه' },
+                    { id: '1422311', name: 'کارگاه الکتروتکنیک', theoretical: 0, practical: 1, total: 1, prerequisites: '', corequisites: '', type: 'پایه' }
                 ];
                 console.log('Courses loaded:', courses);
                 saveData();
